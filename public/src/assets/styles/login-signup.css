@@ -1,0 +1,484 @@
+/* Diseño profesional para login y signup */
+
+/* Contenedor principal */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card principal que contiene todo */
+.auth-card {
+  display: flex;
+  width: 1000px;
+  max-width: 95vw;
+  min-height: 600px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* Sección de imagen */
+.image-section {
+  flex: 1;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+}
+
+.wall-image {
+  width: 100%;
+  height: auto;
+  max-width: 400px;
+  object-fit: contain;
+  z-index: 1;
+  position: relative;
+}
+
+/* Sección del formulario */
+.form-section {
+  flex: 1;
+  padding: 40px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+}
+
+/* Logo */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.app-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* Títulos y textos */
+.form-section h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.form-section > span {
+  font-size: 1rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Botón de Google */
+.google-login {
+  width: 100%;
+  padding: 14px 20px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.google-login:hover {
+  border-color: #8463f9;
+  background: #f8f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(132, 99, 249, 0.15);
+}
+
+.google-login img {
+  width: 22px;
+  height: 22px;
+}
+
+/* Divisor */
+.divider {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin: 24px 0;
+  position: relative;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+  z-index: -1;
+}
+
+.divider span {
+  background: #ffffff;
+  padding: 0 16px;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-field {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #8463f9;
+  box-shadow: 0 0 0 3px rgba(132, 99, 249, 0.1);
+}
+
+input[type="text"].error,
+input[type="email"].error,
+input[type="password"].error,
+input[type="number"].error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Mensajes de error */
+.tooltip-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tooltip-error.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* Remember me / Forgot password */
+.remember-me {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0;
+}
+
+.remember-me a {
+  color: #8463f9;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.remember-me a:hover {
+  text-decoration: underline;
+}
+
+/* Botón principal */
+.login-button {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #8463f9 0%, #a855f7 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(132, 99, 249, 0.4);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner en el botón */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enlaces de registro/login */
+.sign-up {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.sign-up span {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.sign-up a {
+  color: #8463f9;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.sign-up a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos específicos para signup */
+#signup-form .form-field {
+  margin-bottom: 10px;
+}
+
+#signup-form .login-form {
+  gap: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 15px;
+    min-height: 100vh;
+  }
+
+  .auth-card {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Ocultar la imagen en móvil */
+  .image-section {
+    display: none;
+  }
+
+  .form-section {
+    padding: 30px 25px;
+    width: 100%;
+    flex: none;
+  }
+
+  .logo-container {
+    margin-bottom: 25px;
+  }
+
+  .form-section h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .form-section > span {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+  }
+
+  .google-login {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+  }
+
+  .login-form {
+    gap: 15px;
+  }
+
+  .form-field {
+    margin-bottom: 0;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"] {
+    padding: 16px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+
+  .login-button {
+    padding: 18px 20px;
+    font-size: 1.1rem;
+    margin-top: 10px;
+  }
+
+  .sign-up {
+    margin-top: 20px;
+  }
+
+  /* Estilos específicos para signup en móvil */
+  #signup-form .login-form {
+    gap: 12px;
+  }
+
+  #signup-form .form-field {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .auth-card {
+    border-radius: 12px;
+    min-height: calc(100vh - 20px);
+  }
+
+  .form-section {
+    padding: 25px 20px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .logo-container {
+    margin-bottom: 20px;
+  }
+
+  .app-logo {
+    width: 35px;
+    height: 35px;
+  }
+
+  .logo-text {
+    font-size: 1.3rem;
+  }
+
+  .form-section h1 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+  }
+
+  .form-section > span {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .google-login {
+    padding: 15px 18px;
+    margin-bottom: 18px;
+    font-size: 0.95rem;
+  }
+
+  .google-login img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .login-form {
+    gap: 12px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"] {
+    padding: 15px;
+    font-size: 0.95rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+
+  .login-button {
+    padding: 16px 18px;
+    font-size: 1rem;
+    margin-top: 8px;
+  }
+
+  .sign-up {
+    margin-top: 18px;
+  }
+
+  .sign-up span {
+    font-size: 0.9rem;
+  }
+
+  /* Signup específico para móvil pequeño */
+  #signup-form .login-form {
+    gap: 10px;
+  }
+}

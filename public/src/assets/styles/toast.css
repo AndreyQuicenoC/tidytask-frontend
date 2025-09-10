@@ -1,0 +1,143 @@
+/* Estilos para notificaciones toast */
+@import "variables.css";
+
+/* Contenedor principal de toasts */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 350px;
+}
+
+/* Toast individual */
+.toast {
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+
+.toast:before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast.toast-success {
+  background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.toast.toast-error {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.toast.toast-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+  color: #212529;
+}
+
+.toast.toast-info {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+/* Animación de la barra de progreso */
+.toast.show:before {
+  animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+/* Ícono para cada tipo de toast */
+.toast:after {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.toast.toast-success:after {
+  content: "✓";
+  font-weight: bold;
+}
+
+.toast.toast-error:after {
+  content: "✕";
+  font-weight: bold;
+}
+
+.toast.toast-warning:after {
+  content: "⚠";
+}
+
+.toast.toast-info:after {
+  content: "ℹ";
+  font-weight: bold;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+
+  .toast {
+    font-size: 0.9rem;
+    padding: 12px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-container {
+    top: 5px;
+    right: 5px;
+    left: 5px;
+  }
+
+  .toast {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
+
+  .toast:after {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+  }
+}
