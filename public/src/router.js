@@ -12,7 +12,7 @@ function getCurrentRoute() {
 
   console.log("Path detectado:", path, "Hash detectado:", hash);
 
-  // Si estamos en la raíz pero hay un token, ir al dashboard directamente
+  // Si estamos en la raíz y hay un token, ir al dashboard directamente
   if (
     (cleanPath === "" || cleanPath === "index.html") &&
     localStorage.getItem("token")
@@ -20,7 +20,12 @@ function getCurrentRoute() {
     return "dashboard";
   }
 
-  return cleanHash || cleanPath || "login";
+  // Si estamos en la raíz y no hay token, mostrar la landing page (home)
+  if (cleanPath === "" || cleanPath === "index.html") {
+    return "home";
+  }
+
+  return cleanHash || cleanPath || "home";
 }
 
 // Función para obtener query parameters
@@ -39,7 +44,9 @@ export function handleRouting() {
 
   // Mapeo de rutas
   const routeMap = {
-    "": "login",
+    "/": "home",
+    "": "home",
+    home: "home",
     login: "login",
     signup: "signup",
     recovery: "recovery",

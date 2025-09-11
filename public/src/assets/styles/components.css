@@ -64,6 +64,10 @@
   margin-bottom: var(--spacing-xl);
 }
 
+.span-highlight-h1 {
+  color: white;
+}
+
 /* Google Login Button */
 .google-login {
   display: flex;

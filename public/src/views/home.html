@@ -1,0 +1,385 @@
+<link rel="stylesheet" href="/src/assets/styles/base.css" />
+<link rel="stylesheet" href="/src/assets/styles/toast.css" />
+<link rel="stylesheet" href="/src/assets/styles/logo.css" />
+<link rel="stylesheet" href="/src/assets/styles/animations.css" />
+<link rel="stylesheet" href="/src/assets/styles/components.css" />
+
+<!-- Header de navegación -->
+<header class="landing-header">
+    <div class="header-content">
+        <div class="header-logo">
+            <img src="/src/assets/content/logo-tidytasks.png" alt="TidyTasks Logo" class="app-logo">
+            <h2 class="logo-text">TidyTasks</h2>
+        </div>
+        <div class="header-actions">
+            <button id="login-button" class="btn-secondary btn-float">Iniciar Sesión</button>
+            <button id="signup-button" class="btn-primary btn-shine">Registrarse</button>
+        </div>
+    </div>
+</header>
+
+<!-- Sección Hero -->
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">Organiza tu vida con <span class="span-highlight-h1">TidyTasks</span></h1>
+            <p class="hero-description">
+                La aplicación definitiva para gestionar tus tareas de manera eficiente. 
+                Mantén todo organizado, aumenta tu productividad y alcanza tus objetivos.
+            </p>
+            <div class="hero-actions">
+                <button id="get-started-button" class="btn-primary btn-large btn-pulse">Comenzar Gratis</button>
+                <button id="learn-more-button" class="btn-outline btn-large">Saber Más</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="/src/assets/content/wallpaper.svg" alt="TidyTasks Dashboard" class="hero-img">
+        </div>
+    </div>
+</section>
+
+<!-- Sección de características -->
+<section class="features-section">
+    <div class="features-content">
+        <h2 class="section-title">¿Por qué elegir TidyTasks?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">Gestión Intuitiva</h3>
+                <p class="feature-description">Crea, organiza y gestiona tus tareas con una interfaz simple y elegante.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Sincronización en Tiempo Real</h3>
+                <p class="feature-description">Accede a tus tareas desde cualquier dispositivo, siempre actualizadas.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Prioridades Claras</h3>
+                <p class="feature-description">Establece prioridades y fechas límite para mantener el enfoque en lo importante.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Seguimiento de Progreso</h3>
+                <p class="feature-description">Visualiza tu productividad y celebra tus logros con estadísticas detalladas.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección CTA -->
+<section class="cta-section">
+    <div class="cta-content">
+        <h2 class="cta-title">¿Listo para ser más productivo?</h2>
+        <p class="cta-description">Únete a miles de usuarios que ya organizan su vida con TidyTasks</p>
+        <button id="cta-signup-button" class="btn-primary btn-large btn-border-glow">Comenzar Ahora</button>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="landing-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <img src="/src/assets/content/logo-tidytasks.png" alt="TidyTasks" class="footer-logo-img">
+            <span class="footer-brand">TidyTasks</span>
+        </div>
+        <div class="footer-text">
+            <p>&copy; 2025 TidyTasks. Organiza tu vida, alcanza tus metas.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+/* Estilos específicos para la landing page */
+body {
+    padding: 0;
+    margin: 0;
+    background: var(--primary-gradient);
+}
+
+.landing-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(132, 99, 249, 0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+    margin-top: 80px;
+}
+
+.hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.brand-highlight {
+    color: #8463f9;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(132, 99, 249, 0.2);
+}
+
+.features-section {
+    padding: 6rem 2rem;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.features-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(132, 99, 249, 0.2);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.feature-description {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.cta-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(135deg, #8463f9, #6c5ce7);
+    color: white;
+    text-align: center;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.cta-description {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.landing-footer {
+    background: #2d3748;
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-logo-img {
+    width: 32px;
+    height: 32px;
+}
+
+.footer-brand {
+    font-weight: 600;
+    color: #8463f9;
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, #8463f9, #6c5ce7);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #8463f9;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #8463f9;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #8463f9;
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #2d3748;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: #f7fafc;
+    border-color: #8463f9;
+    color: #8463f9;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .landing-header {
+        padding: 1rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+    }
+    
+    .btn-large {
+        width: 100%;
+    }
+}
+</style>
