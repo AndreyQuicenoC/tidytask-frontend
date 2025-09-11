@@ -125,30 +125,9 @@
     background-color: #f0fff4;
   }
 
-  /* Column header styling */
+  /* Hide column header in mobile - only show in tabs */
   .kanban-column.active-column .column-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(132, 99, 249, 0.1);
-  }
-
-  .kanban-column.active-column .column-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-  }
-
-  .kanban-column.active-column .column-header .task-count {
-    background: #8463f9;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
+    display: none;
   }
 
   /* Hide column footer in mobile */
@@ -159,12 +138,13 @@
   /* Mobile tasks container with grid layout for 2 columns */
   .tasks-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 12px;
     padding: 0;
     overflow-y: auto;
     max-height: 60vh;
     min-height: 200px;
+    margin-top: 50px;
   }
 
   /* Task cards with original styling */
@@ -305,11 +285,37 @@
     display: flex !important;
   }
 
-  /* Reset mobile-specific styles */
+  /* Reset mobile-specific styles and restore column headers */
   .kanban-column.active-column {
     background: inherit;
     padding: inherit;
     border-radius: inherit;
+  }
+
+  /* Restore column headers for desktop */
+  .kanban-column .column-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(132, 99, 249, 0.1);
+  }
+
+  .kanban-column .column-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .kanban-column .column-header .task-count {
+    background: #8463f9;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
   }
 
   /* Ensure original column colors are maintained */
