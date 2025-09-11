@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/src/assets/styles/logo.css" />
-<link rel="stylesheet" href="/src/assets/styles/mobile-tabs.css" />
+<link rel="stylesheet" href="/src/assets/styles/adaptive-kanban.css" />
 <link rel="stylesheet" href="/src/assets/styles/animations.css" />
 
 <!-- Header fijo en la parte superior -->
@@ -91,18 +91,18 @@
       <!-- Estado con tareas: se muestra cuando hay al menos una tarea (kanban) -->
       <div id="kanban-board" class="kanban-board" style="display: none">
         <!-- Navegación por tabs para móvil -->
-        <div id="mobile-tabs" class="mobile-tabs">
-          <button class="tab-button active" data-column="todo">
+        <div id="adaptive-tabs" class="adaptive-tabs">
+          <button class="adaptive-tab-button active" data-column="todo">
             Por hacer
-            <span class="tab-count" id="todo-tab-count">0</span>
+            <span class="adaptive-tab-count" id="todo-tab-count">0</span>
           </button>
-          <button class="tab-button" data-column="doing">
+          <button class="adaptive-tab-button" data-column="doing">
             En proceso
-            <span class="tab-count" id="doing-tab-count">0</span>
+            <span class="adaptive-tab-count" id="doing-tab-count">0</span>
           </button>
-          <button class="tab-button" data-column="done">
+          <button class="adaptive-tab-button" data-column="done">
             Completado
-            <span class="tab-count" id="done-tab-count">0</span>
+            <span class="adaptive-tab-count" id="done-tab-count">0</span>
           </button>
         </div>
 

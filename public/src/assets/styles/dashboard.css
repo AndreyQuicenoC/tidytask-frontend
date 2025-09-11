@@ -519,9 +519,10 @@
   .tasks-main-card {
     width: 100%; /* Ocupar todo el ancho disponible */
     max-width: none; /* Sin límite de ancho máximo */
-    border-radius: 5px; /* Reducir el radio de borde */
+    border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
     margin: 15px auto 5px auto;
+    height: 550px;
   }
 
   .kanban-board {

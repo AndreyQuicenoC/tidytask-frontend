@@ -455,17 +455,68 @@ export default function setupDashboard() {
           console.log(
             "Adaptando layout para nuevo tamaño: " + window.innerWidth + "px"
           );
+
+          // Re-inicializar completamente el layout adaptativo
+          resetAdaptiveLayout();
           adjustLayoutForScreenSize();
-        }, 250);
+          setupMobileTabs();
+        }, 100); // Reducido de 250ms a 100ms para respuesta más rápida
       });
       window.hasResizeListener = true;
     }
   }
+
   /**
-   * Configura el funcionamiento de las pestañas móviles
+   * Reinicia el layout adaptativo para una transición suave
+   */
+  function resetAdaptiveLayout() {
+    const kanbanColumns = document.querySelectorAll(".kanban-column");
+    const tabButtons = document.querySelectorAll(".adaptive-tab-button");
+
+    // Si estamos en desktop (>768px), mostrar todas las columnas
+    if (window.innerWidth > 768) {
+      kanbanColumns.forEach((col) => {
+        col.classList.remove("active-column");
+        col.style.display = "flex";
+      });
+
+      // Asegurar que las pestañas móviles estén ocultas
+      const adaptiveTabs = document.getElementById("adaptive-tabs");
+      if (adaptiveTabs) {
+        adaptiveTabs.style.display = "none";
+      }
+    } else {
+      // Si estamos en móvil (<=768px), activar sistema de pestañas
+      const adaptiveTabs = document.getElementById("adaptive-tabs");
+      if (adaptiveTabs) {
+        adaptiveTabs.style.display = "flex";
+      }
+
+      // Mantener solo la columna activa actual o por defecto "todo"
+      const activeButton = document.querySelector(
+        ".adaptive-tab-button.active"
+      );
+      const activeColumn = activeButton
+        ? activeButton.getAttribute("data-column")
+        : "todo";
+
+      kanbanColumns.forEach((col) => {
+        col.classList.remove("active-column");
+        col.style.display = "none";
+      });
+
+      const targetColumn = document.querySelector(`.${activeColumn}-column`);
+      if (targetColumn) {
+        targetColumn.classList.add("active-column");
+        targetColumn.style.display = "flex";
+      }
+    }
+  }
+  /**
+   * Configura el funcionamiento de las pestañas adaptativas
    */
   function setupMobileTabs() {
-    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabButtons = document.querySelectorAll(".adaptive-tab-button");
     const kanbanColumns = document.querySelectorAll(".kanban-column");
 
     // Mostrar por defecto la columna "Por hacer"
@@ -486,7 +537,7 @@ export default function setupDashboard() {
       // Asegurarse de que el primer botón esté activo
       tabButtons.forEach((btn) => btn.classList.remove("active"));
       const todoButton = document.querySelector(
-        '.tab-button[data-column="todo"]'
+        '.adaptive-tab-button[data-column="todo"]'
       );
       if (todoButton) {
         todoButton.classList.add("active");
