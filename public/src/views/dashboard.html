@@ -21,27 +21,44 @@
     <!-- Sección de título y conteo de tareas con botón de nueva tarea -->
     <div class="tasks-header">
       <div class="tasks-title-section">
-        <h1>Mis tareas</h1>
-        <span id="task-counter">0 tareas creadas</span>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+          "
+        >
+          <div>
+            <h1>Mis tareas</h1>
+            <span id="task-counter">0 tareas creadas</span>
+          </div>
+          <div>
+            <button
+              id="new-task-button"
+              class="new-task-button pulse-animation"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Crear tarea
+            </button>
+          </div>
+        </div>
       </div>
       <div id="new-task-button-container" style="display: none">
-        <button id="new-task-button" class="new-task-button pulse-animation">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Nueva tarea
-        </button>
+        <!-- Contenedor oculto mantenido para compatibilidad con el JS existente -->
       </div>
     </div>
     <!-- Contenedor de tareas principal - puede cambiar según el estado -->

@@ -91,6 +91,7 @@
   /* Asegurar que siempre sea visible */
   visibility: visible !important;
   opacity: 1 !important;
+  width: 100%;
 }
 
 .tasks-header h1 {

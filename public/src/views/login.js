@@ -6,6 +6,19 @@ import toast from "../utils/toast.js";
 import { checkAuth } from "../utils/page-loader.js";
 
 export default function setupLogin() {
+  // Limpiar cualquier intervalo anterior de Google Auth que pueda estar ejecutándose
+  if (window.googleAuthCheckInterval) {
+    clearInterval(window.googleAuthCheckInterval);
+    delete window.googleAuthCheckInterval;
+  }
+
+  // Limpiar cualquier intervalo del dashboard que pueda estar ejecutándose
+  if (window.dashboardIntervalId) {
+    clearInterval(window.dashboardIntervalId);
+    delete window.dashboardIntervalId;
+    console.log("Intervalos del dashboard limpiados en login");
+  }
+
   // Verificar si ya hay una sesión activa y redirigir si es necesario
   if (!checkAuth(false)) {
     // Si hay sesión, checkAuth ya redirigió al dashboard
@@ -227,13 +240,34 @@ export default function setupLogin() {
   // Navegar a signup
   document.getElementById("go-signup").addEventListener("click", (e) => {
     e.preventDefault();
+    console.log("Botón go-signup clickeado, navegando a signup...");
+    // Limpiar intervalos antes de navegar
+    if (window.cleanupLoginIntervals) {
+      window.cleanupLoginIntervals();
+    }
     navigateTo("signup");
   });
 
   // Navegar a recovery
   document.getElementById("go-recovery").addEventListener("click", (e) => {
     e.preventDefault();
+    console.log("Botón go-recovery clickeado, navegando a recovery...");
+    // Limpiar intervalos antes de navegar
+    if (window.cleanupLoginIntervals) {
+      window.cleanupLoginIntervals();
+    }
     navigateTo("recovery");
+  });
+
+  // Navegar al home
+  document.getElementById("go-home").addEventListener("click", (e) => {
+    e.preventDefault();
+    console.log("Botón go-home clickeado, navegando a home...");
+    // Limpiar intervalos antes de navegar
+    if (window.cleanupLoginIntervals) {
+      window.cleanupLoginIntervals();
+    }
+    navigateTo("home");
   });
 
   // Botón de login con Google
@@ -382,4 +416,18 @@ export default function setupLogin() {
       }
     }, 30000);
   });
+
+  // Función para limpiar intervalos cuando el usuario navega fuera de login
+  window.cleanupLoginIntervals = function () {
+    if (window.googleAuthCheckInterval) {
+      clearInterval(window.googleAuthCheckInterval);
+      delete window.googleAuthCheckInterval;
+      console.log("Intervalos de Google Auth limpiados");
+    }
+    if (window.dashboardIntervalId) {
+      clearInterval(window.dashboardIntervalId);
+      delete window.dashboardIntervalId;
+      console.log("Intervalos del dashboard limpiados");
+    }
+  };
 }

@@ -65,6 +65,11 @@ export default function setupDashboard() {
   // Inicializar elementos DOM
   initElements();
 
+  // Inicializar estado del botón superior (oculto por defecto hasta cargar tareas)
+  if (elements.addNewTaskBtn) {
+    elements.addNewTaskBtn.style.display = "none";
+  }
+
   // Event listeners
   function setupEventListeners() {
     // Verificar si los elementos existen antes de agregar event listeners
@@ -341,9 +346,6 @@ export default function setupDashboard() {
     if (doneTabCount) doneTabCount.textContent = doneTasks.length;
   }
 
-  /**
-   * Renderiza las tareas en el dashboard
-   */
   function renderTasks() {
     // Ordenar tareas por fecha ascendente
     if (tasks && tasks.length > 0) {
@@ -362,7 +364,7 @@ export default function setupDashboard() {
     if (elements.taskCounter) {
       elements.taskCounter.style.display = "block";
       // Asegurar que siempre muestre el contador correcto
-      elements.taskCounter.textContent = `${tasks.length} tasks created`;
+      elements.taskCounter.textContent = `${tasks.length} tareas creadas`;
     }
 
     if (!tasks || tasks.length === 0) {
@@ -374,17 +376,14 @@ export default function setupDashboard() {
         elements.kanbanBoard.style.display = "none";
       }
 
-      // Ocultar el botón de nueva tarea en el header
-      if (elements.newTaskButton) {
-        elements.newTaskButton.style.display = "none";
-      }
-      if (elements.newTaskButton && elements.newTaskButton.parentElement) {
-        elements.newTaskButton.parentElement.style.display = "none";
-      }
-
-      // Mostrar el botón Create First Task
+      // Mostrar el botón Create First Task (inferior)
       if (elements.createFirstTaskBtn) {
         elements.createFirstTaskBtn.style.display = "block";
+      }
+
+      // Ocultar el botón superior cuando no hay tareas
+      if (elements.addNewTaskBtn) {
+        elements.addNewTaskBtn.style.display = "none";
       }
     } else {
       // Mostrar tablero kanban
@@ -402,14 +401,14 @@ export default function setupDashboard() {
         }
       }
 
-      // Mostrar el botón New Task
-      if (elements.newTaskButton && elements.newTaskButton.parentElement) {
-        elements.newTaskButton.parentElement.style.display = "block";
-      }
-
       // Ocultar botón de primera tarea cuando ya existen tareas
       if (elements.createFirstTaskBtn) {
         elements.createFirstTaskBtn.style.display = "none";
+      }
+
+      // Mostrar el botón superior cuando hay tareas
+      if (elements.addNewTaskBtn) {
+        elements.addNewTaskBtn.style.display = "block";
       }
 
       // Limpiar contenedores

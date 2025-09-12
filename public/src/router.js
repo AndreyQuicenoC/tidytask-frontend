@@ -36,6 +36,12 @@ function getQueryParams() {
 
 // Función para manejar las rutas
 export function handleRouting() {
+  // Evitar ejecutar si estamos en medio de una navegación programática
+  if (window.navigatingProgrammatically) {
+    console.log("Navegación programática en curso, saltando handleRouting");
+    return;
+  }
+
   const route = getCurrentRoute();
   const queryParams = getQueryParams();
 
@@ -83,7 +89,11 @@ export function navigate(route) {
 // Función para cargar vistas dinámicamente
 export async function navigateTo(viewName) {
   try {
+    // Marcar que estamos navegando programáticamente
+    window.navigatingProgrammatically = true;
+
     console.log(`Intentando cargar vista: ${viewName}`);
+    console.log(`URL actual antes del cambio: ${window.location.pathname}`);
 
     // Verificar si tenemos token válido para el dashboard
     if (viewName === "dashboard") {
@@ -92,10 +102,21 @@ export async function navigateTo(viewName) {
         console.warn(
           "Intentando acceder al dashboard sin token, redirigiendo a login"
         );
-        history.pushState({}, "", "/login");
-        navigateTo("login");
-        return;
+        // Cambiar viewName en lugar de hacer llamada recursiva
+        viewName = "login";
       }
+    }
+
+    // Actualizar la URL del navegador para mantener sincronía
+    const newUrl = viewName === "home" ? "/" : `/${viewName}`;
+    if (window.location.pathname !== newUrl) {
+      console.log(
+        `Actualizando URL de ${window.location.pathname} a ${newUrl}`
+      );
+      history.pushState({}, "", newUrl);
+      console.log(`URL actualizada: ${window.location.pathname}`);
+    } else {
+      console.log(`URL ya está correcta: ${newUrl}`);
     }
 
     // Convertir a formato de archivo (primera letra minúscula)
@@ -194,6 +215,11 @@ export async function navigateTo(viewName) {
     document.querySelector(
       "#app"
     ).innerHTML = `<h2>Error al cargar ${viewName}</h2><p>${error.message}</p>`;
+  } finally {
+    // Desmarcar la bandera de navegación programática
+    setTimeout(() => {
+      window.navigatingProgrammatically = false;
+    }, 100);
   }
 }
 
@@ -208,5 +234,9 @@ if (
   document.readyState === "complete" ||
   document.readyState === "interactive"
 ) {
-  setTimeout(handleRouting, 100);
+  // Evitar interferir con navegación manual, solo ejecutar al cargar inicialmente
+  if (!window.routerInitialized) {
+    setTimeout(handleRouting, 100);
+    window.routerInitialized = true;
+  }
 }

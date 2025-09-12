@@ -5,6 +5,28 @@ import { initiateGoogleAuth } from "../utils/safe-google-auth.js";
 import toast from "../utils/toast.js";
 
 export default function setupSignup() {
+  // Limpiar cualquier intervalo de Google Auth que pueda estar ejecutándose desde login
+  if (window.googleAuthCheckInterval) {
+    clearInterval(window.googleAuthCheckInterval);
+    delete window.googleAuthCheckInterval;
+    console.log("Intervalos de Google Auth limpiados en signup");
+  }
+
+  // Limpiar cualquier intervalo del dashboard que pueda estar ejecutándose
+  if (window.dashboardIntervalId) {
+    clearInterval(window.dashboardIntervalId);
+    delete window.dashboardIntervalId;
+    console.log("Intervalos del dashboard limpiados en signup");
+  }
+
+  // Limpiar función de limpieza si existe
+  if (window.cleanupLoginIntervals) {
+    window.cleanupLoginIntervals();
+  }
+
+  // Limpiar cualquier timestamp de intento de Google Auth anterior
+  localStorage.removeItem("google_auth_attempt");
+
   // Referencias a elementos del DOM
   const form = document.getElementById("signup-form");
   const submitButton = document.getElementById("signup-button");
@@ -294,11 +316,13 @@ export default function setupSignup() {
       localStorage.setItem("user", JSON.stringify(res.user));
 
       // Mostrar toast de éxito
-      toast.success("Cuenta creada exitosamente");
+      toast.success(
+        `¡Cuenta creada exitosamente! Bienvenido, ${res.user.firstName}!`
+      );
 
-      // Esperar un momento y redireccionar
+      // Esperar un momento y redireccionar al dashboard (no al login)
       setTimeout(() => {
-        navigateTo("login");
+        navigateTo("dashboard");
       }, 300);
     } catch (err) {
       console.error("Signup error:", err);
@@ -331,7 +355,15 @@ export default function setupSignup() {
   // Navegar a login
   document.getElementById("go-login").addEventListener("click", (e) => {
     e.preventDefault();
+    console.log("Botón go-login clickeado, navegando a login...");
     navigateTo("login");
+  });
+
+  // Navegar al home
+  document.getElementById("go-home").addEventListener("click", (e) => {
+    e.preventDefault();
+    console.log("Botón go-home clickeado, navegando a home...");
+    navigateTo("home");
   });
 
   // Botón de signup con Google
