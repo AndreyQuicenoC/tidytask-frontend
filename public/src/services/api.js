@@ -10,7 +10,7 @@ const getApiUrl = () => {
   if (isProduction) {
     return (
       import.meta.env.VITE_API_URL ||
-      "https://task-manager-backend-5y00.onrender.com/api"
+      "https://tidytask-backend-1.onrender.com"
     );
   }
 
@@ -18,7 +18,7 @@ const getApiUrl = () => {
   return "http://localhost:3001/api";
 };
 
-const API_URL = getApiUrl();
+const API_URL = "https://tidytask-backend-1.onrender.com";
 
 /**
  * Make a GET request to the API
