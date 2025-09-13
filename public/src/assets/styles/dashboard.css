@@ -37,7 +37,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 30px;
-  margin: 20px auto;
+  margin: 40px auto;
   box-sizing: border-box;
 }
 
@@ -290,6 +290,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  margin-right: var(--spacing-md);
 }
 
 .task-actions {

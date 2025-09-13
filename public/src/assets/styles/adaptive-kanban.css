@@ -159,6 +159,7 @@
     color: #666;
     box-sizing: border-box;
     width: 100%;
+    height: 130px;
   }
 
   .task-card:hover {

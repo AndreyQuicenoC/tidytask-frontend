@@ -172,6 +172,11 @@ export async function navigateTo(viewName) {
     appContainer.innerHTML = cleanHtml;
     console.log(`Vista ${viewName} cargada correctamente`);
 
+    // Forzar scroll al top inmediatamente después de cargar el contenido
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     // Agregar los enlaces CSS extraídos al head del documento
     if (cssLinks.length > 0) {
       cssLinks.forEach((href) => {
@@ -205,6 +210,8 @@ export async function navigateTo(viewName) {
               `Posible error al cargar ${viewName}, reintentando...`
             );
           }
+          // Asegurar scroll al top después de la carga del script
+          window.scrollTo(0, 0);
         }, 300);
       }
     } catch (error) {
@@ -219,12 +226,18 @@ export async function navigateTo(viewName) {
     // Desmarcar la bandera de navegación programática
     setTimeout(() => {
       window.navigatingProgrammatically = false;
+      // Scroll final para asegurar posición
+      window.scrollTo(0, 0);
     }, 100);
   }
 }
 
 // Escuchar cambios en el historial del navegador
-window.addEventListener("popstate", handleRouting);
+window.addEventListener("popstate", () => {
+  // Forzar scroll al top en navegación del historial
+  window.scrollTo(0, 0);
+  handleRouting();
+});
 
 // Inicializar el routing cuando se carga la página
 document.addEventListener("DOMContentLoaded", handleRouting);
