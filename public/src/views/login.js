@@ -1,6 +1,6 @@
 // src/views/login.js
 import { login } from "../services/authService.js";
-import { navigateTo } from "../router.js";
+import { navigateTo, resetCurrentView } from "../router.js";
 import { getCurrentUser } from "../services/authService.js";
 import toast from "../utils/toast.js";
 import { checkAuth } from "../utils/page-loader.js";
@@ -177,16 +177,7 @@ export default function setupLogin() {
     try {
       console.log("Intentando iniciar sesión con:", { email });
 
-      // Guardar tiempo de inicio para asegurar un tiempo mínimo de procesamiento
-      const startTime = Date.now();
       const res = await login(email, password);
-      const elapsedTime = Date.now() - startTime;
-
-      // Asegurar que la pantalla de carga se muestre al menos por 1 segundo
-      // pero no más de 3 segundos como indica el requisito
-      const remainingTime = Math.min(3000, Math.max(0, 1000 - elapsedTime));
-      await new Promise((resolve) => setTimeout(resolve, remainingTime));
-
       console.log("Respuesta del servidor:", res);
 
       // Guardamos token y usuario en localStorage
@@ -196,10 +187,13 @@ export default function setupLogin() {
       // Mostrar toast de éxito
       toast.success(`¡Bienvenido, ${res.user.firstName}!`);
 
-      // Esperar un momento y redirigir
+      // Resetear vista actual para forzar recarga del dashboard
+      resetCurrentView();
+
+      // Redirigir inmediatamente con recarga forzada
       setTimeout(() => {
-        navigateTo("dashboard");
-      }, 300);
+        navigateTo("dashboard", true);
+      }, 100);
     } catch (err) {
       console.error("Login error:", err);
 
@@ -238,37 +232,53 @@ export default function setupLogin() {
   });
 
   // Navegar a signup
-  document.getElementById("go-signup").addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("Botón go-signup clickeado, navegando a signup...");
-    // Limpiar intervalos antes de navegar
-    if (window.cleanupLoginIntervals) {
-      window.cleanupLoginIntervals();
-    }
-    navigateTo("signup");
-  });
+  const goSignupBtn = document.getElementById("go-signup");
+  if (goSignupBtn) {
+    goSignupBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Botón go-signup clickeado, navegando a signup...");
+      // Limpiar intervalos antes de navegar
+      if (window.cleanupLoginIntervals) {
+        window.cleanupLoginIntervals();
+      }
+      navigateTo("signup", true);
+    });
+  } else {
+    console.error("Elemento go-signup no encontrado en login.js");
+  }
 
   // Navegar a recovery
-  document.getElementById("go-recovery").addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("Botón go-recovery clickeado, navegando a recovery...");
-    // Limpiar intervalos antes de navegar
-    if (window.cleanupLoginIntervals) {
-      window.cleanupLoginIntervals();
-    }
-    navigateTo("recovery");
-  });
+  const goRecoveryBtn = document.getElementById("go-recovery");
+  if (goRecoveryBtn) {
+    goRecoveryBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Botón go-recovery clickeado, navegando a recovery...");
+      // Limpiar intervalos antes de navegar
+      if (window.cleanupLoginIntervals) {
+        window.cleanupLoginIntervals();
+      }
+      navigateTo("recovery", true);
+    });
+  } else {
+    console.error("Elemento go-recovery no encontrado en login.js");
+  }
 
   // Navegar al home
-  document.getElementById("go-home").addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("Botón go-home clickeado, navegando a home...");
-    // Limpiar intervalos antes de navegar
-    if (window.cleanupLoginIntervals) {
-      window.cleanupLoginIntervals();
-    }
-    navigateTo("home");
-  });
+  const goHomeButton = document.getElementById("go-home");
+  if (goHomeButton) {
+    goHomeButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Botón go-home clickeado, navegando a home...");
+      // Limpiar intervalos antes de navegar
+      if (window.cleanupLoginIntervals) {
+        window.cleanupLoginIntervals();
+      }
+      // Usar navegación forzada para asegurar que se cargue el home
+      navigateTo("home", true);
+    });
+  } else {
+    console.error("Botón go-home no encontrado en login");
+  }
 
   // Botón de login con Google
   document.querySelector(".google-login").addEventListener("click", () => {
@@ -279,8 +289,10 @@ export default function setupLogin() {
       : "http://localhost:3001";
     const googleAuthUrl = `${baseUrl}/api/auth/google`;
 
-    // Guardar timestamp para verificar autenticación reciente
-    localStorage.setItem("google_auth_attempt", Date.now().toString());
+    // Mostrar spinner durante la autenticación
+    buttonText.textContent = "Autenticando...";
+    spinner.classList.remove("hidden");
+    submitButton.disabled = true;
 
     // Crear ventana de autenticación
     const authWindow = window.open(
@@ -289,59 +301,34 @@ export default function setupLogin() {
       "width=600,height=700,top=100,left=100"
     );
 
-    // Mostrar spinner durante la autenticación
-    buttonText.textContent = "Autenticando...";
-    spinner.classList.remove("hidden");
-    submitButton.disabled = true;
-
     // Configurar listener para mensajes de la ventana emergente
     const messageListener = function (event) {
       // Verificar que el mensaje sea de autenticación exitosa
       if (event.data && event.data.type === "AUTH_SUCCESS") {
-        // Limpiar listener para evitar duplicados
         window.removeEventListener("message", messageListener);
+        clearInterval(checkAuth);
 
-        // Limpiar cualquier intervalo de verificación que pueda estar corriendo
-        if (window.googleAuthCheckInterval) {
-          clearInterval(window.googleAuthCheckInterval);
-          delete window.googleAuthCheckInterval;
-        }
-
-        // Procesar el usuario autenticado
         const user = event.data.user;
         if (user) {
-          console.log("Autenticación con Google exitosa a través de mensaje");
-
-          // Mostrar toast de éxito
+          console.log("Autenticación con Google exitosa");
           toast.success(`¡Bienvenido, ${user.firstName}!`);
-
-          // Redirigir al dashboard después de un breve momento
+          // Resetear vista actual para forzar recarga
+          resetCurrentView();
           setTimeout(() => {
-            navigateTo("dashboard");
-          }, 300);
+            navigateTo("dashboard", true);
+          }, 100);
         }
       }
     };
 
-    // Registrar el listener de mensajes
     window.addEventListener("message", messageListener);
 
-    // Verificador alternativo que comprueba periódicamente si hay un nuevo token
+    // Verificador simple que comprueba el token
     const checkAuth = setInterval(() => {
-      const authAttemptTime = parseInt(
-        localStorage.getItem("google_auth_attempt") || "0"
-      );
-      const currentTime = Date.now();
       const token = localStorage.getItem("token");
 
-      // Si hay un token nuevo dentro de la ventana de tiempo relevante
-      if (token && currentTime - authAttemptTime < 30000) {
+      if (token) {
         clearInterval(checkAuth);
-
-        // Guardar la referencia global para poder cancelarla desde el listener de mensajes
-        window.googleAuthCheckInterval = checkAuth;
-
-        // Limpiar el listener de mensajes
         window.removeEventListener("message", messageListener);
 
         try {
@@ -349,65 +336,45 @@ export default function setupLogin() {
           console.log(
             "Autenticación con Google exitosa a través de localStorage"
           );
-
-          // Mostrar toast de éxito
           toast.success(`¡Bienvenido, ${user.firstName}!`);
-
-          // Redirigir al dashboard
+          // Resetear vista actual para forzar recarga
+          resetCurrentView();
           setTimeout(() => {
-            navigateTo("dashboard");
-          }, 300);
+            navigateTo("dashboard", true);
+          }, 100);
         } catch (e) {
           console.error("Error al procesar datos de usuario:", e);
-          // Restablecer botón
           buttonText.textContent = "Iniciar sesión";
           spinner.classList.add("hidden");
           submitButton.disabled = false;
           toast.error("Error al procesar la autenticación");
         }
+        return;
       }
 
-      // Verificar si la ventana se cerró sin errores COOP
+      // Verificar si la ventana se cerró
       try {
         if (authWindow && authWindow.closed) {
-          // Intentar una última verificación del token
-          const newToken = localStorage.getItem("token");
-          if (newToken && newToken !== token) {
-            try {
-              const user = JSON.parse(localStorage.getItem("user"));
-              console.log("Autenticación detectada después de cerrar ventana");
+          clearInterval(checkAuth);
+          window.removeEventListener("message", messageListener);
 
-              toast.success(`¡Bienvenido, ${user.firstName}!`);
-              setTimeout(() => {
-                navigateTo("dashboard");
-              }, 300);
-            } catch (e) {
-              console.error("Error al procesar datos de usuario:", e);
-              // Restablecer botón
-              buttonText.textContent = "Iniciar sesión";
-              spinner.classList.add("hidden");
-              submitButton.disabled = false;
-            }
-          } else {
-            // Si la ventana se cerró pero no hay token, restaurar botón
+          // Restaurar botón si no hay token
+          if (!localStorage.getItem("token")) {
             buttonText.textContent = "Iniciar sesión";
             spinner.classList.add("hidden");
             submitButton.disabled = false;
           }
-          clearInterval(checkAuth);
         }
       } catch (e) {
-        // Ignorar errores COOP, seguir con el intervalo
-        console.log("No se puede acceder a la ventana (política COOP)");
+        // Ignorar errores COOP
       }
     }, 1000);
 
-    // Limitar el tiempo de verificación a 30 segundos
+    // Timeout de seguridad
     setTimeout(() => {
       clearInterval(checkAuth);
       window.removeEventListener("message", messageListener);
 
-      // Restaurar botón si no se completó la autenticación
       if (!localStorage.getItem("token")) {
         buttonText.textContent = "Iniciar sesión";
         spinner.classList.add("hidden");

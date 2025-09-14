@@ -1,6 +1,19 @@
 // Importar utilidades para mejorar la carga de páginas
 import { ensurePageLoaded } from "./utils/page-loader.js";
 
+// Variable para trackear la vista actual y evitar recargas innecesarias
+let currentView = null;
+
+// Función para resetear la vista actual (útil para forzar navegación)
+export function resetCurrentView() {
+  currentView = null;
+}
+
+// Función para obtener la vista actual
+export function getCurrentView() {
+  return currentView;
+}
+
 // Función para obtener la ruta actual
 function getCurrentRoute() {
   const path = window.location.pathname;
@@ -23,6 +36,11 @@ function getCurrentRoute() {
   // Si estamos en la raíz y no hay token, mostrar la landing page (home)
   if (cleanPath === "" || cleanPath === "index.html") {
     return "home";
+  }
+
+  // Manejar específicamente la ruta profile/edit
+  if (cleanPath === "profile/edit" || cleanHash === "profile/edit") {
+    return "profile/edit";
   }
 
   return cleanHash || cleanPath || "home";
@@ -59,9 +77,13 @@ export function handleRouting() {
     reset: "reset",
     dashboard: "dashboard",
     "auth-callback": "auth-callback",
+    profile: "profile",
+    "profile/edit": "profile-edit",
   };
 
   const viewName = routeMap[route] || "login";
+
+  console.log(`Debug: route = '${route}', viewName = '${viewName}'`);
 
   // Verificación especial para reset - debe tener token
   if (viewName === "reset") {
@@ -79,28 +101,59 @@ export function handleRouting() {
 }
 
 // Función para navegar programáticamente
-export function navigate(route) {
-  // Actualizar la URL
-  history.pushState({}, "", `/${route}`);
-  // Cargar la vista
-  navigateTo(route);
+export function navigate(route, forceReload = false) {
+  // Resetear vista actual ya que vamos a navegar a una nueva
+  currentView = null;
+
+  // Aplicar mapeo de rutas
+  const routeMap = {
+    "/": "home",
+    "": "home",
+    home: "home",
+    login: "login",
+    signup: "signup",
+    recovery: "recovery",
+    reset: "reset",
+    dashboard: "dashboard",
+    "auth-callback": "auth-callback",
+    profile: "profile",
+    "profile/edit": "profile-edit",
+    "profile-edit": "profile-edit",
+  };
+
+  const viewName = routeMap[route] || route; // Si no hay mapeo, usar la ruta original
+
+  console.log(`Navigate: route = '${route}', viewName = '${viewName}'`);
+
+  // Actualizar la URL - mantener la ruta original para profile/edit
+  const urlRoute = route === "profile-edit" ? "profile/edit" : route;
+  history.pushState({}, "", `/${urlRoute}`);
+  // Cargar la vista con el nombre correcto
+  navigateTo(viewName, forceReload);
 }
 
 // Función para cargar vistas dinámicamente
-export async function navigateTo(viewName) {
+export async function navigateTo(viewName, forceReload = false) {
   try {
+    // Evitar recargar la misma vista SOLO si no es una recarga forzada
+    if (currentView === viewName && !forceReload) {
+      console.log(`Vista ${viewName} ya está cargada, evitando recarga`);
+      return;
+    }
+
     // Marcar que estamos navegando programáticamente
     window.navigatingProgrammatically = true;
 
     console.log(`Intentando cargar vista: ${viewName}`);
     console.log(`URL actual antes del cambio: ${window.location.pathname}`);
 
-    // Verificar si tenemos token válido para el dashboard
-    if (viewName === "dashboard") {
+    // Verificar si tenemos token válido para rutas protegidas
+    const protectedRoutes = ["dashboard", "profile", "profile-edit"];
+    if (protectedRoutes.includes(viewName)) {
       const token = localStorage.getItem("token");
       if (!token) {
         console.warn(
-          "Intentando acceder al dashboard sin token, redirigiendo a login"
+          `Intentando acceder a ${viewName} sin token, redirigiendo a login`
         );
         // Cambiar viewName en lugar de hacer llamada recursiva
         viewName = "login";
@@ -108,7 +161,15 @@ export async function navigateTo(viewName) {
     }
 
     // Actualizar la URL del navegador para mantener sincronía
-    const newUrl = viewName === "home" ? "/" : `/${viewName}`;
+    let newUrl;
+    if (viewName === "home") {
+      newUrl = "/";
+    } else if (viewName === "profile-edit") {
+      newUrl = "/profile/edit";
+    } else {
+      newUrl = `/${viewName}`;
+    }
+
     if (window.location.pathname !== newUrl) {
       console.log(
         `Actualizando URL de ${window.location.pathname} a ${newUrl}`
@@ -121,6 +182,10 @@ export async function navigateTo(viewName) {
 
     // Convertir a formato de archivo (primera letra minúscula)
     const fileViewName = viewName.charAt(0).toLowerCase() + viewName.slice(1);
+
+    console.log(
+      `Debug: viewName = ${viewName}, fileViewName = ${fileViewName}`
+    );
 
     // Caso especial para auth-callback
     if (viewName === "auth-callback") {
@@ -195,24 +260,27 @@ export async function navigateTo(viewName) {
     // Importa el script asociado a la vista
     try {
       console.log(`Intentando cargar script: ./views/${fileViewName}.js`);
-      // Limpiamos caché para forzar la recarga del módulo
-      const moduleUrl = `./views/${fileViewName}.js?v=${Date.now()}`;
+      // Solo limpiar caché si es necesario (por ejemplo, en desarrollo)
+      const isDevelopment =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      const moduleUrl = isDevelopment
+        ? `./views/${fileViewName}.js?v=${Date.now()}`
+        : `./views/${fileViewName}.js`;
+
       const module = await import(moduleUrl);
 
       if (module.default) {
         console.log(`Ejecutando setup de ${viewName}`);
         module.default(); // Ejecuta setup si existe
 
-        // Verificar carga correcta después de un momento
+        // Actualizar vista actual después de carga exitosa
+        currentView = viewName;
+
+        // Asegurar scroll al top después de la carga del script
         setTimeout(() => {
-          if (!ensurePageLoaded(viewName)) {
-            console.warn(
-              `Posible error al cargar ${viewName}, reintentando...`
-            );
-          }
-          // Asegurar scroll al top después de la carga del script
           window.scrollTo(0, 0);
-        }, 300);
+        }, 100);
       }
     } catch (error) {
       console.error(`Error al cargar script de ${viewName}:`, error);

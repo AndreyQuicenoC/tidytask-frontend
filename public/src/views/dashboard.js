@@ -1,5 +1,5 @@
 // src/views/Dashboard.js
-import { navigateTo } from "../router.js";
+import { navigateTo, navigate } from "../router.js";
 import { logout, getCurrentUser } from "../services/authService.js";
 import { get, post, put, del } from "../services/api.js";
 import toast from "../utils/toast.js";
@@ -47,7 +47,13 @@ export default function setupDashboard() {
     elements = {
       userNameDisplay: document.getElementById("user-name"),
       userAvatarLetter: document.getElementById("user-avatar-letter"),
+      profileButton: document.getElementById("profile-button"),
       logoutButton: document.getElementById("logout-button"),
+      // Mobile menu elements
+      hamburgerButton: document.getElementById("hamburger-button"),
+      mobileDropdown: document.getElementById("mobile-dropdown"),
+      mobileProfileButton: document.getElementById("mobile-profile-button"),
+      mobileLogoutButton: document.getElementById("mobile-logout-button"),
       taskCounter: document.getElementById("task-counter"),
       emptyState: document.getElementById("empty-state"),
       kanbanBoard: document.getElementById("kanban-board"),
@@ -73,9 +79,50 @@ export default function setupDashboard() {
   // Event listeners
   function setupEventListeners() {
     // Verificar si los elementos existen antes de agregar event listeners
+    if (elements.profileButton) {
+      elements.profileButton.addEventListener("click", () => {
+        navigate("profile");
+      });
+    }
+
     if (elements.logoutButton) {
       elements.logoutButton.addEventListener("click", handleLogout);
     }
+
+    // Mobile menu event listeners
+    if (elements.hamburgerButton) {
+      elements.hamburgerButton.addEventListener("click", toggleMobileMenu);
+    }
+
+    if (elements.mobileProfileButton) {
+      elements.mobileProfileButton.addEventListener("click", () => {
+        closeMobileMenu();
+        navigate("profile");
+      });
+    }
+
+    if (elements.mobileLogoutButton) {
+      elements.mobileLogoutButton.addEventListener("click", () => {
+        closeMobileMenu();
+        handleLogout();
+      });
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener("click", (event) => {
+      if (elements.mobileDropdown && elements.hamburgerButton) {
+        const isClickInsideMenu =
+          elements.mobileDropdown.contains(event.target) ||
+          elements.hamburgerButton.contains(event.target);
+
+        if (
+          !isClickInsideMenu &&
+          elements.mobileDropdown.classList.contains("show")
+        ) {
+          closeMobileMenu();
+        }
+      }
+    });
 
     if (elements.taskForm) {
       elements.taskForm.addEventListener("submit", handleTaskFormSubmit);
@@ -92,6 +139,12 @@ export default function setupDashboard() {
     if (elements.addNewTaskBtn) {
       elements.addNewTaskBtn.addEventListener("click", openNewTaskModal);
     }
+
+    // Handle window resize for responsive layout
+    window.addEventListener("resize", handleResponsiveLayout);
+
+    // Initialize responsive layout on load
+    handleResponsiveLayout();
   }
 
   // Llamar a la función de configuración de event listeners
@@ -1253,6 +1306,67 @@ export default function setupDashboard() {
       } catch (reloadError) {
         console.error("Error recargando tareas:", reloadError);
       }
+    }
+  }
+
+  /**
+   * Handle responsive layout changes
+   */
+  function handleResponsiveLayout() {
+    const desktopElements = document.querySelectorAll(".desktop-only");
+    const mobileElements = document.querySelectorAll(".mobile-only");
+
+    if (window.innerWidth <= 768) {
+      // Mobile layout
+      desktopElements.forEach((el) => {
+        el.style.display = "none";
+      });
+      mobileElements.forEach((el) => {
+        el.style.display = "block";
+      });
+    } else {
+      // Desktop layout
+      desktopElements.forEach((el) => {
+        el.style.display = "flex";
+      });
+      mobileElements.forEach((el) => {
+        el.style.display = "none";
+      });
+    }
+  }
+
+  /**
+   * Toggle mobile menu visibility
+   */
+  function toggleMobileMenu() {
+    if (elements.hamburgerButton && elements.mobileDropdown) {
+      const isOpen = elements.mobileDropdown.classList.contains("show");
+
+      if (isOpen) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    }
+  }
+
+  /**
+   * Open mobile menu
+   */
+  function openMobileMenu() {
+    if (elements.hamburgerButton && elements.mobileDropdown) {
+      elements.hamburgerButton.classList.add("active");
+      elements.mobileDropdown.classList.add("show");
+    }
+  }
+
+  /**
+   * Close mobile menu
+   */
+  function closeMobileMenu() {
+    if (elements.hamburgerButton && elements.mobileDropdown) {
+      elements.hamburgerButton.classList.remove("active");
+      elements.mobileDropdown.classList.remove("show");
     }
   }
 }

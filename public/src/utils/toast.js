@@ -14,6 +14,7 @@ class ToastManager {
 
     this.toasts = [];
     this.maxToasts = 3; // Máximo número de toasts visibles simultáneamente
+    this.recentMessages = new Map(); // Para prevenir duplicados
   }
 
   /**
@@ -23,10 +24,49 @@ class ToastManager {
    * @param {number} duration - Duración en ms (por defecto 5000ms)
    */
   show(message, type = "info", duration = 5000) {
+    // Crear clave única para el mensaje
+    const messageKey = `${message}-${type}`;
+
+    // Verificar si este mensaje ya se mostró recientemente (últimos 3 segundos)
+    const now = Date.now();
+    if (this.recentMessages.has(messageKey)) {
+      const lastShown = this.recentMessages.get(messageKey);
+      if (now - lastShown < 3000) {
+        console.log("Toast duplicado bloqueado:", message);
+        return null; // No mostrar mensaje duplicado
+      }
+    }
+
+    // Registrar este mensaje
+    this.recentMessages.set(messageKey, now);
+
+    // Limpiar mensajes antiguos del cache (más de 10 segundos)
+    for (const [key, timestamp] of this.recentMessages.entries()) {
+      if (now - timestamp > 10000) {
+        this.recentMessages.delete(key);
+      }
+    }
+
     // Crear elemento toast
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `${message}`;
+
+    // Crear botón de cerrar
+    const closeButton = document.createElement("button");
+    closeButton.className = "toast-close";
+    closeButton.innerHTML = "&times;";
+    closeButton.addEventListener("click", () => {
+      this.remove(toast);
+    });
+
+    // Crear contenido del mensaje
+    const messageContent = document.createElement("span");
+    messageContent.className = "toast-message";
+    messageContent.innerHTML = message;
+
+    // Ensamblar el toast
+    toast.appendChild(messageContent);
+    toast.appendChild(closeButton);
 
     // Añadir el toast al contenedor
     this.container.appendChild(toast);
@@ -38,9 +78,11 @@ class ToastManager {
     }, 10);
 
     // Eliminar toast después de la duración especificada
-    setTimeout(() => {
-      this.remove(toast);
-    }, duration);
+    if (duration > 0) {
+      setTimeout(() => {
+        this.remove(toast);
+      }, duration);
+    }
 
     // Limitar el número de toasts visibles
     this.limitToasts();
@@ -97,13 +139,25 @@ class ToastManager {
   }
 }
 
-// Crear instancia global
-const toast = new ToastManager();
+// Crear instancia global única
+let toastInstance = null;
+
+if (!window.toastManagerInstance) {
+  toastInstance = new ToastManager();
+  window.toastManagerInstance = toastInstance;
+  console.log("Nueva instancia de ToastManager creada");
+} else {
+  toastInstance = window.toastManagerInstance;
+  console.log("Reutilizando instancia existente de ToastManager");
+}
 
 // Reemplazar el método alert nativo
-const originalAlert = window.alert;
-window.alert = function (message) {
-  toast.info(message);
-};
+if (!window.alertReplaced) {
+  const originalAlert = window.alert;
+  window.alert = function (message) {
+    toastInstance.info(message);
+  };
+  window.alertReplaced = true;
+}
 
-export default toast;
+export default toastInstance;
