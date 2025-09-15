@@ -8,6 +8,17 @@ let isNavigating = false; // Nueva bandera para evitar bucles
 let isInitialized = false; // Nueva bandera para evitar múltiples inicializaciones
 
 /**
+ * Resetear estado del perfil para forzar recarga
+ */
+export function resetProfileState() {
+  console.log("Reseteando estado del perfil");
+  isInitialized = false;
+  isNavigating = false;
+  userProfile = null;
+  isLoading = false;
+}
+
+/**
  * Configuración inicial de la página de perfil
  */
 function initProfile() {
@@ -27,14 +38,13 @@ function initProfile() {
     console.log("Intervalos de Google Auth limpiados en profile");
   }
 
-  // Evitar reinicialización si ya estamos navegando o inicializados
-  if (isNavigating || isInitialized) {
-    console.log(
-      "Ya estamos navegando o inicializados, evitando reinicialización"
-    );
+  // Solo evitar reinicialización si ya estamos navegando en este momento
+  if (isNavigating) {
+    console.log("Ya estamos navegando, evitando reinicialización");
     return;
   }
 
+  // Resetear estado de inicialización para permitir recargas cuando regresamos de otras páginas
   isInitialized = true;
 
   // Verificar autenticación
