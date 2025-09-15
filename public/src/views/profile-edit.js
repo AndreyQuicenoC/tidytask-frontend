@@ -9,6 +9,18 @@ let isSaving = false;
 let isChangingPassword = false;
 let isInitialized = false;
 
+/**
+ * Resetear estado del profile-edit para forzar reinicialización
+ */
+export function resetProfileEditState() {
+  console.log("Reseteando estado del profile-edit");
+  isInitialized = false;
+  originalData = null;
+  isLoading = false;
+  isSaving = false;
+  isChangingPassword = false;
+}
+
 // Patrones de validación
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -32,9 +44,10 @@ function initProfileEdit() {
     console.log("Intervalos de Google Auth limpiados en profile-edit");
   }
 
-  // Prevenir múltiples inicializaciones
+  // Prevenir múltiples inicializaciones de datos, pero siempre configurar event listeners
   if (isInitialized) {
-    console.log("Profile-edit ya inicializado, cargando datos...");
+    console.log("Profile-edit ya inicializado, reconfigurando listeners y cargando datos...");
+    setupEventListeners(); // Siempre reconfigurar listeners
     loadProfileData();
     return;
   }
@@ -47,7 +60,7 @@ function initProfileEdit() {
     return;
   }
 
-  // Configurar event listeners solo una vez
+  // Configurar event listeners
   setupEventListeners();
   isInitialized = true;
 
@@ -613,6 +626,7 @@ async function handlePasswordSubmit(e) {
   isChangingPassword = true;
   const btn = document.getElementById("change-password-btn");
   const spinner = document.getElementById("password-spinner");
+  let wasSuccessful = false;
 
   if (btn) btn.disabled = true;
   if (spinner) spinner.style.display = "inline-block";
@@ -633,16 +647,23 @@ async function handlePasswordSubmit(e) {
     const data = await put("/users/me/password", formData, true);
 
     if (data.success) {
+      wasSuccessful = true;
       // Limpiar formulario
       document.getElementById("change-password-form").reset();
 
-      // Limpiar errores
+      // Limpiar errores y estado de validación
       fields.forEach((fieldName) => {
         const errorElement = document.getElementById(`${fieldName}-error`);
         const field = document.getElementById(fieldName);
         if (errorElement) errorElement.textContent = "";
-        if (field) field.classList.remove("error");
+        if (field) {
+          field.classList.remove("error");
+          field.classList.remove("valid");
+        }
       });
+
+      // Ocultar formulario de contraseña después del éxito
+      hidePasswordForm();
 
       window.toast?.show("Contraseña actualizada exitosamente", "success");
     } else {
@@ -658,7 +679,11 @@ async function handlePasswordSubmit(e) {
     isChangingPassword = false;
     if (btn) btn.disabled = false;
     if (spinner) spinner.style.display = "none";
-    updatePasswordButtonState();
+    
+    // Solo actualizar estado del botón si no fue exitoso
+    if (!wasSuccessful) {
+      updatePasswordButtonState();
+    }
   }
 }
 

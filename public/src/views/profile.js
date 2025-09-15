@@ -1,5 +1,6 @@
 import { navigate } from "../router.js";
 import { get, del } from "../services/api.js";
+import { resetProfileEditState } from "./profile-edit.js";
 
 // Estado de la aplicación
 let userProfile = null;
@@ -73,7 +74,12 @@ function setupEventListeners() {
     editBtn.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Navegando a profile-edit...");
-      navigate("profile-edit");
+      try {
+        resetProfileEditState(); // Resetear estado antes de navegar
+        navigate("profile-edit");
+      } catch (error) {
+        console.error("Error navegando a profile-edit:", error);
+      }
     });
   } else {
     console.error("Botón edit-profile-btn no encontrado");
