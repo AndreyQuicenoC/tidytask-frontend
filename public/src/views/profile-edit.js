@@ -1,6 +1,5 @@
 import { navigate } from "../router.js";
-
-const API_BASE_URL = "/api";
+import { get, put } from "../services/api.js";
 
 // Estado de la aplicación
 let originalData = null;
