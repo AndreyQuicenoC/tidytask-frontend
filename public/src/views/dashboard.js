@@ -50,8 +50,8 @@ export default function setupDashboard() {
       profileButton: document.getElementById("profile-button"),
       logoutButton: document.getElementById("logout-button"),
       // Mobile menu elements
-      hamburgerButton: document.getElementById("hamburger-button"),
-      mobileDropdown: document.getElementById("mobile-dropdown"),
+      hamburgerButton: document.querySelector(".hamburger-btn"),
+      headerNav: document.querySelector(".header-nav"),
       mobileProfileButton: document.getElementById("mobile-profile-button"),
       mobileLogoutButton: document.getElementById("mobile-logout-button"),
       taskCounter: document.getElementById("task-counter"),
@@ -110,17 +110,24 @@ export default function setupDashboard() {
 
     // Close mobile menu when clicking outside
     document.addEventListener("click", (event) => {
-      if (elements.mobileDropdown && elements.hamburgerButton) {
+      if (elements.headerNav && elements.hamburgerButton) {
         const isClickInsideMenu =
-          elements.mobileDropdown.contains(event.target) ||
+          elements.headerNav.contains(event.target) ||
           elements.hamburgerButton.contains(event.target);
 
         if (
           !isClickInsideMenu &&
-          elements.mobileDropdown.classList.contains("show")
+          elements.headerNav.classList.contains("open")
         ) {
           closeMobileMenu();
         }
+      }
+    });
+
+    // Close mobile menu with ESC key
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && elements.headerNav?.classList.contains("open")) {
+        closeMobileMenu();
       }
     });
 
@@ -1339,8 +1346,8 @@ export default function setupDashboard() {
    * Toggle mobile menu visibility
    */
   function toggleMobileMenu() {
-    if (elements.hamburgerButton && elements.mobileDropdown) {
-      const isOpen = elements.mobileDropdown.classList.contains("show");
+    if (elements.hamburgerButton && elements.headerNav) {
+      const isOpen = elements.headerNav.classList.contains("open");
 
       if (isOpen) {
         closeMobileMenu();
@@ -1354,9 +1361,9 @@ export default function setupDashboard() {
    * Open mobile menu
    */
   function openMobileMenu() {
-    if (elements.hamburgerButton && elements.mobileDropdown) {
+    if (elements.hamburgerButton && elements.headerNav) {
       elements.hamburgerButton.classList.add("active");
-      elements.mobileDropdown.classList.add("show");
+      elements.headerNav.classList.add("open");
     }
   }
 
@@ -1364,9 +1371,9 @@ export default function setupDashboard() {
    * Close mobile menu
    */
   function closeMobileMenu() {
-    if (elements.hamburgerButton && elements.mobileDropdown) {
+    if (elements.hamburgerButton && elements.headerNav) {
       elements.hamburgerButton.classList.remove("active");
-      elements.mobileDropdown.classList.remove("show");
+      elements.headerNav.classList.remove("open");
     }
   }
 }

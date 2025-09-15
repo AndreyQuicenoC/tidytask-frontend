@@ -79,6 +79,9 @@ export default function setupHome() {
 
   // Animación de aparición para las cards de características
   setupFeatureCardsAnimation();
+
+  // Configurar menú hamburguesa
+  setupHamburgerMenu();
 }
 
 function updateHeaderForLoggedUser() {
@@ -91,6 +94,13 @@ function updateHeaderForLoggedUser() {
     const dashboardButton = document.getElementById("dashboard-button");
     if (dashboardButton) {
       dashboardButton.addEventListener("click", () => {
+        // Cerrar menú hamburguesa si está abierto
+        const hamburgerBtn = document.getElementById("hamburger-btn");
+        const headerNav = document.getElementById("header-nav");
+        if (hamburgerBtn && headerNav) {
+          hamburgerBtn.classList.remove("active");
+          headerNav.classList.remove("active");
+        }
         navigateTo("dashboard");
       });
     }
@@ -147,6 +157,65 @@ function setupFeatureCardsAnimation() {
     card.style.transition = "opacity 0.6s ease, transform 0.6s ease";
 
     observer.observe(card);
+  });
+}
+
+function setupHamburgerMenu() {
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const headerNav = document.getElementById("header-nav");
+  
+  if (!hamburgerBtn || !headerNav) {
+    console.log("Elementos del menú hamburguesa no encontrados");
+    return;
+  }
+
+  // Toggle del menú hamburguesa
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevenir que se propague al document
+    const isActive = hamburgerBtn.classList.contains("active");
+    
+    if (isActive) {
+      // Cerrar menú
+      hamburgerBtn.classList.remove("active");
+      headerNav.classList.remove("active");
+    } else {
+      // Abrir menú
+      hamburgerBtn.classList.add("active");
+      headerNav.classList.add("active");
+    }
+  });
+
+  // Cerrar menú al hacer clic en los botones de navegación
+  const navButtons = headerNav.querySelectorAll("button");
+  navButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      hamburgerBtn.classList.remove("active");
+      headerNav.classList.remove("active");
+    });
+  });
+
+  // Cerrar menú al hacer clic fuera de él
+  document.addEventListener("click", (e) => {
+    if (!hamburgerBtn.contains(e.target) && !headerNav.contains(e.target)) {
+      hamburgerBtn.classList.remove("active");
+      headerNav.classList.remove("active");
+    }
+  });
+
+  // Cerrar menú al redimensionar la ventana (para volver a desktop)
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 768) {
+      hamburgerBtn.classList.remove("active");
+      headerNav.classList.remove("active");
+    }
+  });
+
+  // Cerrar menú con tecla ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && headerNav.classList.contains("active")) {
+      hamburgerBtn.classList.remove("active");
+      headerNav.classList.remove("active");
+    }
   });
 }
 
