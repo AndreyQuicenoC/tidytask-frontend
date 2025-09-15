@@ -1,0 +1,139 @@
+<link rel="stylesheet" href="/src/assets/styles/base.css" />
+<link rel="stylesheet" href="/src/assets/styles/components.css" />
+<link rel="stylesheet" href="/src/assets/styles/logo.css" />
+<link rel="stylesheet" href="/src/assets/styles/spinners.css" />
+<link rel="stylesheet" href="/src/assets/styles/toast.css" />
+<link rel="stylesheet" href="/src/assets/styles/profile.css" />
+
+<!-- Header fijo -->
+<header class="app-header">
+  <div class="user-avatar">
+    <span id="user-avatar-letter">U</span>
+  </div>
+  <div class="user-display">
+    <span id="user-name">Usuario</span>
+  </div>
+  <button id="logout-button" class="log-out-button">Cerrar sesión</button>
+</header>
+
+<!-- Contenedor principal -->
+<div class="profile-container">
+  <div class="profile-card">
+    <!-- Skeleton/Loading state -->
+    <div id="profile-skeleton" class="profile-skeleton">
+      <div class="skeleton-header">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-text skeleton-title"></div>
+      </div>
+      <div class="skeleton-content">
+        <div class="skeleton-field">
+          <div class="skeleton-text skeleton-label"></div>
+          <div class="skeleton-text skeleton-value"></div>
+        </div>
+        <div class="skeleton-field">
+          <div class="skeleton-text skeleton-label"></div>
+          <div class="skeleton-text skeleton-value"></div>
+        </div>
+        <div class="skeleton-field">
+          <div class="skeleton-text skeleton-label"></div>
+          <div class="skeleton-text skeleton-value"></div>
+        </div>
+        <div class="skeleton-field">
+          <div class="skeleton-text skeleton-label"></div>
+          <div class="skeleton-text skeleton-value"></div>
+        </div>
+        <div class="skeleton-field">
+          <div class="skeleton-text skeleton-label"></div>
+          <div class="skeleton-text skeleton-value"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile content -->
+    <div id="profile-content" class="profile-content" style="display: none">
+      <!-- Back to Dashboard Button -->
+      <div class="navigation-header">
+        <button type="button" id="back-to-dashboard" class="btn-back">
+          <i class="icon-arrow-left"></i> Volver al Dashboard
+        </button>
+      </div>
+
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <span id="profile-avatar-letter">U</span>
+        </div>
+        <h1 id="profile-full-name">Nombre Completo</h1>
+      </div>
+
+      <div class="profile-info">
+        <div class="info-group">
+          <label class="info-label">Nombres</label>
+          <div class="info-value" id="profile-first-name">-</div>
+        </div>
+
+        <div class="info-group">
+          <label class="info-label">Apellidos</label>
+          <div class="info-value" id="profile-last-name">-</div>
+        </div>
+
+        <div class="info-group">
+          <label class="info-label">Edad</label>
+          <div class="info-value" id="profile-age">-</div>
+        </div>
+
+        <div class="info-group">
+          <label class="info-label">Correo</label>
+          <div class="info-value" id="profile-email">-</div>
+        </div>
+
+        <div class="info-group">
+          <label class="info-label">Miembro desde</label>
+          <div class="info-value" id="profile-member-since">-</div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button id="edit-profile-btn" class="btn-primary">
+          <i class="icon-edit"></i>
+          Editar perfil
+        </button>
+        <button id="delete-account-btn" class="btn-danger">
+          <i class="icon-delete"></i>
+          Eliminar cuenta
+        </button>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="profile-error" class="profile-error" style="display: none">
+      <div class="error-icon">⚠️</div>
+      <h3>Error al cargar el perfil</h3>
+      <p id="error-message">No pudimos obtener tu información de perfil</p>
+      <button id="retry-btn" class="btn-secondary">Reintentar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar cuenta -->
+<div id="delete-modal" class="modal" style="display: none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Eliminar cuenta</h3>
+      <button id="close-modal" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
+      <p class="warning-text">
+        Esta acción no se puede deshacer. Todos tus datos serán eliminados
+        permanentemente.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel-delete" class="btn-secondary">Cancelar</button>
+      <button id="confirm-delete" class="btn-danger">
+        <span id="delete-spinner" class="spinner" style="display: none"></span>
+        Eliminar cuenta
+      </button>
+    </div>
+  </div>
+</div>

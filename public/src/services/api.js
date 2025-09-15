@@ -10,7 +10,9 @@ const getApiUrl = () => {
   if (isProduction) {
     return (
       import.meta.env.VITE_API_URL ||
+
       "https://tidytasks-80b95fdaeb61.herokuapp.com"
+
     );
   }
 
@@ -18,7 +20,9 @@ const getApiUrl = () => {
   return "http://localhost:3001/api";
 };
 
+
 const API_URL = "https://tidytasks-80b95fdaeb61.herokuapp.com";
+
 
 /**
  * Make a GET request to the API

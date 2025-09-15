@@ -8,11 +8,11 @@ export function ensurePageLoaded(route) {
   // Verificar si la página tiene el contenido esperado
   const appContainer = document.querySelector("#app");
 
-  // Si el contenedor está vacío o solo tiene un mensaje de error, reintentar
+  // Solo reintentar si hay un error obvio, no por contenido normal
   if (
     !appContainer ||
-    appContainer.innerHTML.trim() === "" ||
-    appContainer.innerHTML.includes("Error al cargar")
+    appContainer.innerHTML.includes("Error al cargar") ||
+    (appContainer.innerHTML.trim() === "" && document.readyState === "complete")
   ) {
     console.log("Detectada página no cargada correctamente, reintentando...");
 
@@ -41,10 +41,10 @@ export function setupPageEvents(setupFn, pageName) {
     setupFn();
   }
 
-  // Verificar nuevamente con un retraso por si hay problemas
-  setTimeout(() => {
-    ensurePageLoaded(pageName);
-  }, 500);
+  // Nota: Removimos la verificación automática que causaba bucles infinitos
+  // setTimeout(() => {
+  //   ensurePageLoaded(pageName);
+  // }, 500);
 }
 
 // Exportar función para verificar autenticación y redirigir si es necesario
