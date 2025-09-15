@@ -13,6 +13,20 @@ let isInitialized = false; // Nueva bandera para evitar múltiples inicializacio
 function initProfile() {
   console.log("Inicializando página de perfil");
 
+  // Limpiar cualquier intervalo del dashboard que pueda estar ejecutándose
+  if (window.dashboardIntervalId) {
+    clearInterval(window.dashboardIntervalId);
+    window.dashboardIntervalId = null;
+    console.log("Intervalos del dashboard limpiados en profile");
+  }
+
+  // Limpiar cualquier intervalo de Google Auth que pueda estar ejecutándose
+  if (window.googleAuthCheckInterval) {
+    clearInterval(window.googleAuthCheckInterval);
+    delete window.googleAuthCheckInterval;
+    console.log("Intervalos de Google Auth limpiados en profile");
+  }
+
   // Evitar reinicialización si ya estamos navegando o inicializados
   if (isNavigating || isInitialized) {
     console.log(
@@ -46,9 +60,13 @@ function setupEventListeners() {
   // Botón de editar perfil
   const editBtn = document.getElementById("edit-profile-btn");
   if (editBtn) {
-    editBtn.addEventListener("click", () => {
-      navigate("profile/edit");
+    editBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Navegando a profile-edit...");
+      navigate("profile-edit");
     });
+  } else {
+    console.error("Botón edit-profile-btn no encontrado");
   }
 
   // Botón de eliminar cuenta
@@ -66,15 +84,25 @@ function setupEventListeners() {
   // Botón de logout
   const logoutBtn = document.getElementById("logout-button");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", handleLogout);
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Cerrando sesión...");
+      handleLogout();
+    });
+  } else {
+    console.error("Botón logout-button no encontrado");
   }
 
   // Botón de volver al dashboard
   const backToDashboardBtn = document.getElementById("back-to-dashboard");
   if (backToDashboardBtn) {
-    backToDashboardBtn.addEventListener("click", () => {
+    backToDashboardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Navegando al dashboard...");
       navigate("dashboard");
     });
+  } else {
+    console.error("Botón back-to-dashboard no encontrado");
   }
 
   // Modal de eliminar cuenta
@@ -134,6 +162,7 @@ async function loadUserProfile() {
       userProfile = data.data;
       displayProfile(userProfile);
       updateHeaderInfo(userProfile);
+      updateNavInfo(userProfile); // Agregar actualización del nav
     } else {
       throw new Error("Datos de perfil no válidos");
     }
@@ -236,6 +265,26 @@ function updateHeaderInfo(profile) {
 }
 
 /**
+ * Actualizar información del usuario en la navegación
+ */
+function updateNavInfo(profile) {
+  // Los elementos ya se actualizan en updateHeaderInfo
+  // Pero agreguemos logs para debugging
+  console.log("Actualizando info del nav con perfil:", profile);
+  
+  // También actualizar localStorage para que otros componentes lo usen
+  const userData = {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    email: profile.email,
+    age: profile.age
+  };
+  
+  localStorage.setItem("user", JSON.stringify(userData));
+  console.log("Datos de usuario guardados en localStorage");
+}
+
+/**
  * Formatear fecha para mostrar
  */
 function formatDate(dateString) {
@@ -315,10 +364,25 @@ async function handleDeleteAccount() {
  * Manejar logout
  */
 function handleLogout() {
+  console.log("Ejecutando logout...");
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  window.toast?.show("Sesión cerrada exitosamente", "success");
-  navigate("home");
+  
+  // Mostrar mensaje de éxito
+  if (window.toast) {
+    window.toast.show("Sesión cerrada exitosamente", "success");
+  }
+  
+  // Limpiar estado de la aplicación
+  userProfile = null;
+  isLoading = false;
+  isNavigating = false;
+  isInitialized = false;
+  
+  // Navegar al home
+  setTimeout(() => {
+    navigate("home");
+  }, 100);
 }
 
 // Exportar función de inicialización
