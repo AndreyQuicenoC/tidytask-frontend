@@ -1,5 +1,6 @@
 import { navigate } from "../router.js";
 import { get, put } from "../services/api.js";
+import { resetProfileState } from "./profile.js";
 
 // Estado de la aplicación
 let originalData = null;
@@ -65,6 +66,7 @@ function setupEventListeners() {
       e.preventDefault();
       console.log("Botón volver al perfil clickeado");
       try {
+        resetProfileState(); // Resetear estado antes de navegar
         navigate("profile");
       } catch (error) {
         console.error("Error navegando al perfil:", error);
@@ -79,6 +81,7 @@ function setupEventListeners() {
       e.preventDefault();
       console.log("Botón cancelar clickeado");
       try {
+        resetProfileState(); // Resetear estado antes de navegar
         navigate("profile");
       } catch (error) {
         console.error("Error cancelando edición:", error);
@@ -407,9 +410,21 @@ function validatePasswordField(fieldName) {
       if (!value) {
         isValid = false;
         errorMessage = "La nueva contraseña es requerida";
-      } else if (value.length < 6) {
+      } else if (value.length < 8) {
         isValid = false;
-        errorMessage = "Debe tener al menos 6 caracteres";
+        errorMessage = "Debe tener al menos 8 caracteres";
+      } else if (!/(?=.*[0-9])/.test(value)) {
+        isValid = false;
+        errorMessage = "Debe contener al menos un número";
+      } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) {
+        isValid = false;
+        errorMessage = "Debe contener al menos un carácter especial (!@#$%^&*()_+=-[]{}|;':\",./<>?)";
+      } else if (!/(?=.*[a-z])/.test(value)) {
+        isValid = false;
+        errorMessage = "Debe contener al menos una letra minúscula";
+      } else if (!/(?=.*[A-Z])/.test(value)) {
+        isValid = false;
+        errorMessage = "Debe contener al menos una letra mayúscula";
       }
       break;
 
@@ -544,6 +559,9 @@ async function handleProfileSubmit(e) {
       updateNavInfo(data.data);
 
       window.toast?.show("Perfil actualizado exitosamente", "success");
+      
+      // Resetear estado del perfil antes de navegar para forzar recarga
+      resetProfileState();
       navigate("profile");
     } else {
       throw new Error("Respuesta inválida del servidor");
