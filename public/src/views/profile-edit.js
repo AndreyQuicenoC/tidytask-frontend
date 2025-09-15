@@ -61,13 +61,29 @@ function setupEventListeners() {
   // Botón de volver
   const backBtn = document.getElementById("back-btn");
   if (backBtn) {
-    backBtn.addEventListener("click", () => navigate("profile"));
+    backBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      console.log("Botón volver al perfil clickeado");
+      try {
+        navigate("profile");
+      } catch (error) {
+        console.error("Error navegando al perfil:", error);
+      }
+    });
   }
 
   // Botón de cancelar
   const cancelBtn = document.getElementById("cancel-btn");
   if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => navigate("profile"));
+    cancelBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      console.log("Botón cancelar clickeado");
+      try {
+        navigate("profile");
+      } catch (error) {
+        console.error("Error cancelando edición:", error);
+      }
+    });
   }
 
   // Botón de reintentar
@@ -79,7 +95,15 @@ function setupEventListeners() {
   // Botón de logout
   const logoutBtn = document.getElementById("logout-button");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", handleLogout);
+    logoutBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      console.log("Botón logout clickeado en profile-edit");
+      try {
+        handleLogout();
+      } catch (error) {
+        console.error("Error en logout desde profile-edit:", error);
+      }
+    });
   }
 
   // Formulario de edición de perfil
@@ -167,6 +191,7 @@ async function loadProfileData() {
       originalData = data.data;
       populateForm(originalData);
       updateHeaderInfo(originalData);
+      updateNavInfo(originalData); // Agregar actualización del nav
       showForm();
     } else {
       throw new Error("Datos de perfil no válidos");
@@ -273,6 +298,26 @@ function updateHeaderInfo(profile) {
   if (userAvatarElement) {
     userAvatarElement.textContent = profile.firstName.charAt(0).toUpperCase();
   }
+}
+
+/**
+ * Actualizar información del usuario en la navegación
+ */
+function updateNavInfo(profile) {
+  // Los elementos ya se actualizan en updateHeaderInfo
+  // Pero agreguemos logs para debugging
+  console.log("Actualizando info del nav en profile-edit con perfil:", profile);
+  
+  // También actualizar localStorage para que otros componentes lo usen
+  const userData = {
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    email: profile.email,
+    age: profile.age
+  };
+  
+  localStorage.setItem("user", JSON.stringify(userData));
+  console.log("Datos de usuario guardados en localStorage desde profile-edit");
 }
 
 /**
@@ -493,6 +538,10 @@ async function handleProfileSubmit(e) {
         });
         localStorage.setItem("user", JSON.stringify(user));
       }
+
+      // Actualizar información del header con los nuevos datos
+      updateHeaderInfo(data.data);
+      updateNavInfo(data.data);
 
       window.toast?.show("Perfil actualizado exitosamente", "success");
       navigate("profile");
