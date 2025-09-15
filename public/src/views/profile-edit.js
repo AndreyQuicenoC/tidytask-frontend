@@ -17,6 +17,20 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function initProfileEdit() {
   console.log("Inicializando página de edición de perfil");
 
+  // Limpiar cualquier intervalo del dashboard que pueda estar ejecutándose
+  if (window.dashboardIntervalId) {
+    clearInterval(window.dashboardIntervalId);
+    window.dashboardIntervalId = null;
+    console.log("Intervalos del dashboard limpiados en profile-edit");
+  }
+
+  // Limpiar cualquier intervalo de Google Auth que pueda estar ejecutándose
+  if (window.googleAuthCheckInterval) {
+    clearInterval(window.googleAuthCheckInterval);
+    delete window.googleAuthCheckInterval;
+    console.log("Intervalos de Google Auth limpiados en profile-edit");
+  }
+
   // Prevenir múltiples inicializaciones
   if (isInitialized) {
     console.log("Profile-edit ya inicializado, cargando datos...");
@@ -146,33 +160,8 @@ async function loadProfileData() {
       throw new Error("Token no encontrado");
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.toast?.show(
-        "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        "warning"
-      );
-      navigate("login");
-      return;
-    }
-
-    if (!response.ok) {
-      if (response.status >= 500) {
-        throw new Error("Error del servidor");
-      }
-      throw new Error("Error al obtener el perfil");
-    }
-
-    const data = await response.json();
+    // Usar el servicio API en lugar de fetch directo
+    const data = await get("/users/me", true);
 
     if (data.success && data.data) {
       originalData = data.data;
@@ -485,36 +474,8 @@ async function handleProfileSubmit(e) {
       email: document.getElementById("email").value.trim(),
     };
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.toast?.show("Tu sesión ha expirado", "warning");
-      navigate("login");
-      return;
-    }
-
-    if (response.status === 409) {
-      window.toast?.show("Este correo electrónico ya está registrado", "error");
-      return;
-    }
-
-    if (!response.ok) {
-      if (response.status >= 500) {
-        throw new Error("Error del servidor");
-      }
-      throw new Error("Error al actualizar el perfil");
-    }
-
-    const data = await response.json();
+    // Usar el servicio API en lugar de fetch directo
+    const data = await put("/users/me", formData, true);
 
     if (data.success && data.data) {
       // Actualizar datos originales
@@ -601,29 +562,8 @@ async function handlePasswordSubmit(e) {
       confirmPassword: document.getElementById("confirmPassword").value,
     };
 
-    const response = await fetch(`${API_BASE_URL}/users/me/password`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.toast?.show("Tu sesión ha expirado", "warning");
-      navigate("login");
-      return;
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al cambiar la contraseña");
-    }
-
-    const data = await response.json();
+    // Usar el servicio API en lugar de fetch directo
+    const data = await put("/users/me/password", formData, true);
 
     if (data.success) {
       // Limpiar formulario
