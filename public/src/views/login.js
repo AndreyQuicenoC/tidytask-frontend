@@ -285,7 +285,6 @@ export default function setupLogin() {
     // URL específica para Google Auth (usar la URL correcta según el entorno)
     const isProduction = window.location.hostname !== "localhost";
     const baseUrl = isProduction
-
       ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
       : "http://localhost:3001";
     const googleAuthUrl = `${baseUrl}/api/auth/google`;

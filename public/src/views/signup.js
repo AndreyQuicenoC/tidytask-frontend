@@ -443,35 +443,21 @@ export default function setupSignup() {
     }
   });
 
-
-  document.getElementById("go-login").addEventListener("click", (e) => {
-    e.preventDefault();
-    navigateTo("login");
-  });
-
-  // Botón de signup con Google
-  const googleLoginButton = document.querySelector(".google-login");
-  if (googleLoginButton) {
-    googleLoginButton.addEventListener("click", () => {
-      // URL específica para Google Auth (usar la URL correcta según el entorno)
-      const isProduction = window.location.hostname !== "localhost";
-      const baseUrl = isProduction
-        ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
-        : "http://localhost:3001";
-      const googleAuthUrl = `${baseUrl}/api/auth/google`;
-
-    // Mostrar spinner durante la autenticación
-    buttonText.textContent = "Autenticando...";
-    spinner.classList.remove("hidden");
-    submitButton.disabled = true; // Usar el nuevo método seguro para iniciar la autenticación
-    const auth = initiateGoogleAuth(googleAuthUrl);
-
-    // Configurar el verificador de estado
-    auth.checkAuthStatus((error, user) => {
-      // Restablecer botón en cualquier caso
-      buttonText.textContent = "Registrarse";
-      spinner.classList.add("hidden");
-      submitButton.disabled = false;
+  // Navegar a login
+  const goLoginBtn = document.getElementById("go-login");
+  if (goLoginBtn) {
+    goLoginBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Botón go-login clickeado, navegando a login...");
+      // Limpiar intervalos antes de navegar
+      if (window.cleanupLoginIntervals) {
+        window.cleanupLoginIntervals();
+      }
+      navigateTo("login", true);
+    });
+  } else {
+    console.error("Elemento go-login no encontrado en signup.js");
+  }
 
   // Navegar al home
   const goHomeButton = document.getElementById("go-home");
@@ -479,7 +465,7 @@ export default function setupSignup() {
     goHomeButton.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Botón go-home clickeado, navegando a home...");
-      // Limpiar intervalos antes de navegar (igual que en login)
+      // Limpiar intervalos antes de navegar
       if (window.cleanupLoginIntervals) {
         window.cleanupLoginIntervals();
       }
@@ -497,7 +483,7 @@ export default function setupSignup() {
       // URL específica para Google Auth (usar la URL correcta según el entorno)
       const isProduction = window.location.hostname !== "localhost";
       const baseUrl = isProduction
-        ? "https://task-manager-backend-5y00.onrender.com"
+        ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
         : "http://localhost:3001";
       const googleAuthUrl = `${baseUrl}/api/auth/google`;
 
@@ -512,7 +498,7 @@ export default function setupSignup() {
       // Configurar el verificador de estado
       auth.checkAuthStatus((error, user) => {
         // Restablecer botón en cualquier caso
-        buttonText.textContent = "Registrarse";
+        buttonText.textContent = "Crear Cuenta";
         spinner.classList.add("hidden");
         submitButton.disabled = false;
 
@@ -524,10 +510,8 @@ export default function setupSignup() {
 
         if (user) {
           console.log("Autenticación con Google exitosa");
-
           // Mostrar toast y redirigir al dashboard
           toast.success(`¡Bienvenido, ${user.firstName}!`);
-
           // Redirigir al dashboard después de un breve momento
           setTimeout(() => {
             navigateTo("dashboard");

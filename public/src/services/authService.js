@@ -9,17 +9,11 @@ import { post } from "./api.js";
 const getApiBaseUrl = () => {
   const isProduction = window.location.hostname !== "localhost";
   return isProduction
-
-    ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
-    : "http://localhost:3001";
+    ? "https://tidytasks-80b95fdaeb61.herokuapp.com/api"
+    : "http://localhost:3001/api";
 };
 
-const API_BASE_URL = "https://tidytasks-80b95fdaeb61.herokuapp.com";
-
-    ? "https://tidytask-backend-1.onrender.com"
-    : "http://localhost:3001";
-};
-
+const API_BASE_URL = "https://tidytasks-80b95fdaeb61.herokuapp.com/api";
 
 /**
  * Log in a user with email and password
@@ -100,7 +94,7 @@ export async function resetPassword(token, newPassword) {
   console.log("Resetting password with token:", token);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
