@@ -1,4 +1,4 @@
-import { navigateTo } from "../router.js";
+import { navigate } from "../router.js";
 import toast from "../utils/toast.js";
 
 export default function setupHome() {
@@ -22,7 +22,7 @@ export default function setupHome() {
   if (loginButton) {
     loginButton.addEventListener("click", () => {
       console.log("Navegando a login desde header");
-      navigateTo("login");
+      navigate("login");
     });
   }
 
@@ -31,7 +31,7 @@ export default function setupHome() {
   if (signupButton) {
     signupButton.addEventListener("click", () => {
       console.log("Navegando a signup desde header");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -40,7 +40,7 @@ export default function setupHome() {
   if (getStartedButton) {
     getStartedButton.addEventListener("click", () => {
       console.log("Navegando a signup desde hero");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -63,7 +63,7 @@ export default function setupHome() {
   if (ctaSignupButton) {
     ctaSignupButton.addEventListener("click", () => {
       console.log("Navegando a signup desde CTA");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -101,7 +101,7 @@ function updateHeaderForLoggedUser() {
           hamburgerBtn.classList.remove("active");
           headerNav.classList.remove("active");
         }
-        navigateTo("dashboard");
+        navigate("dashboard");
       });
     }
   }
