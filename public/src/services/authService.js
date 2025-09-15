@@ -9,11 +9,11 @@ import { post } from "./api.js";
 const getApiBaseUrl = () => {
   const isProduction = window.location.hostname !== "localhost";
   return isProduction
-    ? "https://task-manager-backend-5y00.onrender.com"
+    ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
     : "http://localhost:3001";
 };
 
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = "https://tidytasks-80b95fdaeb61.herokuapp.com";
 
 /**
  * Log in a user with email and password

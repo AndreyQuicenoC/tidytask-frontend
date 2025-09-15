@@ -241,7 +241,7 @@ export default function setupLogin() {
     // URL específica para Google Auth (usar la URL correcta según el entorno)
     const isProduction = window.location.hostname !== "localhost";
     const baseUrl = isProduction
-      ? "https://task-manager-backend-5y00.onrender.com"
+      ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
       : "http://localhost:3001";
     const googleAuthUrl = `${baseUrl}/api/auth/google`;
 

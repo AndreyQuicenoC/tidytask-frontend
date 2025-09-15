@@ -335,13 +335,15 @@ export default function setupSignup() {
   });
 
   // Botón de signup con Google
-  document.querySelector(".google-login").addEventListener("click", () => {
-    // URL específica para Google Auth (usar la URL correcta según el entorno)
-    const isProduction = window.location.hostname !== "localhost";
-    const baseUrl = isProduction
-      ? "https://task-manager-backend-5y00.onrender.com"
-      : "http://localhost:3001";
-    const googleAuthUrl = `${baseUrl}/api/auth/google`;
+  const googleLoginButton = document.querySelector(".google-login");
+  if (googleLoginButton) {
+    googleLoginButton.addEventListener("click", () => {
+      // URL específica para Google Auth (usar la URL correcta según el entorno)
+      const isProduction = window.location.hostname !== "localhost";
+      const baseUrl = isProduction
+        ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
+        : "http://localhost:3001";
+      const googleAuthUrl = `${baseUrl}/api/auth/google`;
 
     // Mostrar spinner durante la autenticación
     buttonText.textContent = "Autenticando...";
