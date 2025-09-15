@@ -720,10 +720,44 @@
   }
 
   /* Mostrar navegación cuando está activa */
-  .header-nav.active {
+  .header-nav.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+  }
+
+  /* Ocultar acciones de escritorio en móvil */
+  .app-header > .header-actions {
+    display: none;
+  }
+
+  /* Estilos para los botones dentro del menú hamburguesa */  
+  .header-nav .btn-float {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: none;
+    color: #374151;
+    font-size: 0.95rem;
+    box-shadow: none;
+  }
+  
+  .header-nav .btn-float:last-child {
+    border-bottom: none;
+  }
+  
+  .header-nav .btn-float:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: none;
+    transform: none;
+  }
+  
+  .header-nav .btn-float svg {
+    color: #6b7280;
   }
 
   /* Estilo de acciones en móvil */

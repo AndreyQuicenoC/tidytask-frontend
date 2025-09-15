@@ -177,11 +177,11 @@ function setupHamburgerMenu() {
     if (isActive) {
       // Cerrar menú
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     } else {
       // Abrir menú
       hamburgerBtn.classList.add("active");
-      headerNav.classList.add("active");
+      headerNav.classList.add("open");
     }
   });
 
@@ -190,7 +190,7 @@ function setupHamburgerMenu() {
   navButtons.forEach(button => {
     button.addEventListener("click", () => {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     });
   });
 
@@ -216,7 +216,7 @@ function setupHamburgerMenu() {
   document.addEventListener("click", (e) => {
     if (!hamburgerBtn.contains(e.target) && !headerNav.contains(e.target)) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 
@@ -224,15 +224,15 @@ function setupHamburgerMenu() {
   window.addEventListener("resize", () => {
     if (window.innerWidth > 768) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 
   // Cerrar menú con tecla ESC
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && headerNav.classList.contains("active")) {
+    if (e.key === "Escape" && headerNav.classList.contains("open")) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 }
