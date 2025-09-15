@@ -12,6 +12,11 @@ console.log("Aplicación iniciada");
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM cargado, iniciando routing");
 
+  // Forzar scroll al top al cargar la página
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
   const needsDashboardRedirect = localStorage.getItem(
     "needs_dashboard_redirect"
   );
@@ -31,5 +36,23 @@ if (
   document.readyState === "interactive"
 ) {
   console.log("DOM ya está cargado, iniciando routing inmediatamente");
+  // Forzar scroll al top
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
   handleRouting();
+}
+
+// Manejar el evento de carga completa de la ventana
+window.addEventListener("load", () => {
+  console.log("Ventana completamente cargada");
+  // Forzar scroll al top después de la carga completa
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+});
+
+// Prevenir el comportamiento de scroll restore del navegador
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
 }

@@ -37,7 +37,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 30px;
-  margin: 20px auto;
+  margin: 40px auto;
   box-sizing: border-box;
 }
 
@@ -73,6 +73,150 @@
 
 .log-out-button:hover {
   background: #d65f49;
+  transform: translateY(-2px);
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Clases para responsive design */
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #8463f9;
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-medium);
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.profile-button:hover {
+  background: #6d4aff;
+  transform: translateY(-2px);
+}
+
+.profile-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: relative;
+}
+
+.hamburger-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  gap: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-line {
+  width: 22px;
+  height: 2px;
+  background-color: #374151;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-button.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.mobile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  transform: translateY(-10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-dropdown.show {
+  transform: translateY(8px);
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-item {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.mobile-menu-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-menu-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.mobile-menu-button:hover {
+  background-color: #f9fafb;
+}
+
+.mobile-menu-button svg {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+/* Responsive visibility classes */
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
 }
 
 /* Tasks Header */
@@ -91,6 +235,7 @@
   /* Asegurar que siempre sea visible */
   visibility: visible !important;
   opacity: 1 !important;
+  width: 100%;
 }
 
 .tasks-header h1 {
@@ -289,6 +434,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  margin-right: var(--spacing-md);
 }
 
 .task-actions {
@@ -596,6 +742,21 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* Mostrar menú hamburguesa en móviles */
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Ajustar dropdown para móviles */
+  .mobile-dropdown {
+    min-width: 180px;
+    right: -8px;
   }
 }
 

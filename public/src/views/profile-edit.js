@@ -1,0 +1,717 @@
+import { navigate } from "../router.js";
+
+const API_BASE_URL = "/api";
+
+// Estado de la aplicación
+let originalData = null;
+let isLoading = false;
+let isSaving = false;
+let isChangingPassword = false;
+let isInitialized = false;
+
+// Patrones de validación
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Configuración inicial de la página de edición de perfil
+ */
+function initProfileEdit() {
+  console.log("Inicializando página de edición de perfil");
+
+  // Prevenir múltiples inicializaciones
+  if (isInitialized) {
+    console.log("Profile-edit ya inicializado, cargando datos...");
+    loadProfileData();
+    return;
+  }
+
+  // Verificar autenticación
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.log("No hay token, redirigiendo a login");
+    navigate("login");
+    return;
+  }
+
+  // Configurar event listeners solo una vez
+  setupEventListeners();
+  isInitialized = true;
+
+  // Cargar datos del perfil
+  loadProfileData();
+}
+
+/**
+ * Configurar todos los event listeners
+ */
+function setupEventListeners() {
+  // Botón de volver
+  const backBtn = document.getElementById("back-btn");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => navigate("profile"));
+  }
+
+  // Botón de cancelar
+  const cancelBtn = document.getElementById("cancel-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => navigate("profile"));
+  }
+
+  // Botón de reintentar
+  const retryBtn = document.getElementById("retry-edit-btn");
+  if (retryBtn) {
+    retryBtn.addEventListener("click", loadProfileData);
+  }
+
+  // Botón de logout
+  const logoutBtn = document.getElementById("logout-button");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout);
+  }
+
+  // Formulario de edición de perfil
+  const editForm = document.getElementById("edit-profile-form");
+  if (editForm) {
+    editForm.addEventListener("submit", handleProfileSubmit);
+    setupProfileValidation();
+  }
+
+  // Formulario de cambio de contraseña
+  const passwordForm = document.getElementById("change-password-form");
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", handlePasswordSubmit);
+    setupPasswordValidation();
+  }
+
+  // Botones para mostrar/ocultar formulario de contraseña
+  const showPasswordBtn = document.getElementById("show-password-form");
+  const hidePasswordBtn = document.getElementById("hide-password-form");
+
+  if (showPasswordBtn) {
+    showPasswordBtn.addEventListener("click", showPasswordForm);
+  }
+
+  if (hidePasswordBtn) {
+    hidePasswordBtn.addEventListener("click", hidePasswordForm);
+  }
+}
+
+/**
+ * Configurar validación en tiempo real para el formulario de perfil
+ */
+function setupProfileValidation() {
+  const fields = ["firstName", "lastName", "age", "email"];
+
+  fields.forEach((fieldName) => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.addEventListener("input", () => {
+        validateField(fieldName);
+        updateSaveButtonState();
+      });
+      field.addEventListener("blur", () => validateField(fieldName));
+    }
+  });
+}
+
+/**
+ * Configurar validación para el formulario de cambio de contraseña
+ */
+function setupPasswordValidation() {
+  const fields = ["currentPassword", "newPassword", "confirmPassword"];
+
+  fields.forEach((fieldName) => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.addEventListener("input", () => {
+        validatePasswordField(fieldName);
+        updatePasswordButtonState();
+      });
+      field.addEventListener("blur", () => validatePasswordField(fieldName));
+    }
+  });
+}
+
+/**
+ * Cargar datos del perfil desde el backend
+ */
+async function loadProfileData() {
+  if (isLoading) return;
+
+  isLoading = true;
+  showSkeleton();
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token no encontrado");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.toast?.show(
+        "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+        "warning"
+      );
+      navigate("login");
+      return;
+    }
+
+    if (!response.ok) {
+      if (response.status >= 500) {
+        throw new Error("Error del servidor");
+      }
+      throw new Error("Error al obtener el perfil");
+    }
+
+    const data = await response.json();
+
+    if (data.success && data.data) {
+      originalData = data.data;
+      populateForm(originalData);
+      updateHeaderInfo(originalData);
+      showForm();
+    } else {
+      throw new Error("Datos de perfil no válidos");
+    }
+  } catch (error) {
+    console.error("Error loading profile data:", error);
+
+    if (error.message === "Error del servidor") {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Server error details:", error);
+      }
+      showError("No pudimos cargar tu información de perfil");
+    } else {
+      showError(error.message || "Error al cargar los datos");
+    }
+  } finally {
+    isLoading = false;
+  }
+}
+
+/**
+ * Mostrar skeleton de carga
+ */
+function showSkeleton() {
+  const skeleton = document.getElementById("edit-skeleton");
+  const form = document.getElementById("edit-profile-form");
+  const error = document.getElementById("edit-error");
+
+  if (skeleton) skeleton.style.display = "block";
+  if (form) form.style.display = "none";
+  if (error) error.style.display = "none";
+}
+
+/**
+ * Mostrar formulario
+ */
+function showForm() {
+  const skeleton = document.getElementById("edit-skeleton");
+  const form = document.getElementById("edit-profile-form");
+  const error = document.getElementById("edit-error");
+
+  if (skeleton) skeleton.style.display = "none";
+  if (form) form.style.display = "block";
+  if (error) error.style.display = "none";
+}
+
+/**
+ * Mostrar estado de error
+ */
+function showError(message) {
+  const skeleton = document.getElementById("edit-skeleton");
+  const form = document.getElementById("edit-profile-form");
+  const error = document.getElementById("edit-error");
+  const errorMessage = document.getElementById("edit-error-message");
+
+  if (skeleton) skeleton.style.display = "none";
+  if (form) form.style.display = "none";
+  if (error) error.style.display = "block";
+  if (errorMessage) errorMessage.textContent = message;
+}
+
+/**
+ * Poblar formulario con datos del perfil
+ */
+function populateForm(data) {
+  const fields = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    age: data.age,
+    email: data.email,
+  };
+
+  Object.entries(fields).forEach(([fieldName, value]) => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.value = value;
+    }
+  });
+
+  // Actualizar avatar con letra inicial
+  const avatarLetter = document.getElementById("profile-avatar-letter");
+  if (avatarLetter) {
+    avatarLetter.textContent = data.firstName
+      ? data.firstName.charAt(0).toUpperCase()
+      : "U";
+  }
+
+  // Validar todos los campos inicialmente
+  Object.keys(fields).forEach((fieldName) => validateField(fieldName));
+  updateSaveButtonState();
+}
+
+/**
+ * Actualizar información del header
+ */
+function updateHeaderInfo(profile) {
+  const userNameElement = document.getElementById("user-name");
+  const userAvatarElement = document.getElementById("user-avatar-letter");
+
+  if (userNameElement) {
+    userNameElement.textContent = `${profile.firstName} ${profile.lastName}`;
+  }
+
+  if (userAvatarElement) {
+    userAvatarElement.textContent = profile.firstName.charAt(0).toUpperCase();
+  }
+}
+
+/**
+ * Validar un campo específico del perfil
+ */
+function validateField(fieldName) {
+  const field = document.getElementById(fieldName);
+  const errorElement = document.getElementById(`${fieldName}-error`);
+
+  if (!field || !errorElement) return false;
+
+  let isValid = true;
+  let errorMessage = "";
+
+  const value = field.value.trim();
+
+  switch (fieldName) {
+    case "firstName":
+    case "lastName":
+      if (!value) {
+        isValid = false;
+        errorMessage =
+          fieldName === "firstName"
+            ? "El nombre es requerido"
+            : "El apellido es requerido";
+      } else if (value.length < 1) {
+        isValid = false;
+        errorMessage = "Debe tener al menos 1 carácter";
+      }
+      break;
+
+    case "age":
+      const age = parseInt(value);
+      if (!value || isNaN(age)) {
+        isValid = false;
+        errorMessage = "La edad es requerida";
+      } else if (age < 13) {
+        isValid = false;
+        errorMessage = "Debes tener al menos 13 años";
+      } else if (age > 120) {
+        isValid = false;
+        errorMessage = "Edad no válida";
+      }
+      break;
+
+    case "email":
+      if (!value) {
+        isValid = false;
+        errorMessage = "El correo es requerido";
+      } else if (!emailPattern.test(value)) {
+        isValid = false;
+        errorMessage = "Formato de correo inválido";
+      }
+      break;
+  }
+
+  // Actualizar UI
+  errorElement.textContent = errorMessage;
+  field.classList.toggle("error", !isValid);
+
+  return isValid;
+}
+
+/**
+ * Validar campos de contraseña
+ */
+function validatePasswordField(fieldName) {
+  const field = document.getElementById(fieldName);
+  const errorElement = document.getElementById(`${fieldName}-error`);
+
+  if (!field || !errorElement) return false;
+
+  let isValid = true;
+  let errorMessage = "";
+
+  const value = field.value;
+
+  switch (fieldName) {
+    case "currentPassword":
+      if (!value) {
+        isValid = false;
+        errorMessage = "La contraseña actual es requerida";
+      }
+      break;
+
+    case "newPassword":
+      if (!value) {
+        isValid = false;
+        errorMessage = "La nueva contraseña es requerida";
+      } else if (value.length < 6) {
+        isValid = false;
+        errorMessage = "Debe tener al menos 6 caracteres";
+      }
+      break;
+
+    case "confirmPassword":
+      const newPassword = document.getElementById("newPassword")?.value;
+      if (!value) {
+        isValid = false;
+        errorMessage = "Confirma la nueva contraseña";
+      } else if (value !== newPassword) {
+        isValid = false;
+        errorMessage = "Las contraseñas no coinciden";
+      }
+      break;
+  }
+
+  // Actualizar UI
+  errorElement.textContent = errorMessage;
+  field.classList.toggle("error", !isValid);
+
+  return isValid;
+}
+
+/**
+ * Actualizar estado del botón guardar
+ */
+function updateSaveButtonState() {
+  const saveBtn = document.getElementById("save-btn");
+  if (!saveBtn) return;
+
+  const fields = ["firstName", "lastName", "age", "email"];
+  const allValid = fields.every((fieldName) => validateField(fieldName));
+  const hasChanges = hasProfileChanges();
+
+  saveBtn.disabled = !allValid || !hasChanges || isSaving;
+}
+
+/**
+ * Actualizar estado del botón de cambiar contraseña
+ */
+function updatePasswordButtonState() {
+  const btn = document.getElementById("change-password-btn");
+  if (!btn) return;
+
+  const fields = ["currentPassword", "newPassword", "confirmPassword"];
+  const allValid = fields.every((fieldName) =>
+    validatePasswordField(fieldName)
+  );
+
+  btn.disabled = !allValid || isChangingPassword;
+}
+
+/**
+ * Verificar si hay cambios en el perfil
+ */
+function hasProfileChanges() {
+  if (!originalData) return false;
+
+  const currentData = {
+    firstName: document.getElementById("firstName")?.value.trim(),
+    lastName: document.getElementById("lastName")?.value.trim(),
+    age: parseInt(document.getElementById("age")?.value),
+    email: document.getElementById("email")?.value.trim(),
+  };
+
+  return Object.keys(currentData).some(
+    (key) => currentData[key] !== originalData[key]
+  );
+}
+
+/**
+ * Manejar envío del formulario de perfil
+ */
+async function handleProfileSubmit(e) {
+  e.preventDefault();
+
+  if (isSaving) return;
+
+  // Validar todos los campos
+  const fields = ["firstName", "lastName", "age", "email"];
+  const allValid = fields.every((fieldName) => validateField(fieldName));
+
+  if (!allValid) {
+    window.toast?.show(
+      "Por favor, corrige los errores en el formulario",
+      "error"
+    );
+    return;
+  }
+
+  isSaving = true;
+  const saveBtn = document.getElementById("save-btn");
+  const spinner = document.getElementById("save-spinner");
+
+  if (saveBtn) saveBtn.disabled = true;
+  if (spinner) spinner.style.display = "inline-block";
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token no encontrado");
+    }
+
+    const formData = {
+      firstName: document.getElementById("firstName").value.trim(),
+      lastName: document.getElementById("lastName").value.trim(),
+      age: parseInt(document.getElementById("age").value),
+      email: document.getElementById("email").value.trim(),
+    };
+
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.toast?.show("Tu sesión ha expirado", "warning");
+      navigate("login");
+      return;
+    }
+
+    if (response.status === 409) {
+      window.toast?.show("Este correo electrónico ya está registrado", "error");
+      return;
+    }
+
+    if (!response.ok) {
+      if (response.status >= 500) {
+        throw new Error("Error del servidor");
+      }
+      throw new Error("Error al actualizar el perfil");
+    }
+
+    const data = await response.json();
+
+    if (data.success && data.data) {
+      // Actualizar datos originales
+      originalData = data.data;
+
+      // Actualizar localStorage si existe
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        Object.assign(user, {
+          firstName: data.data.firstName,
+          lastName: data.data.lastName,
+          age: data.data.age,
+          email: data.data.email,
+        });
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      window.toast?.show("Perfil actualizado exitosamente", "success");
+      navigate("profile");
+    } else {
+      throw new Error("Respuesta inválida del servidor");
+    }
+  } catch (error) {
+    console.error("Error updating profile:", error);
+
+    if (error.message === "Error del servidor") {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Server error details:", error);
+      }
+      window.toast?.show("Error interno del servidor", "error");
+    } else {
+      window.toast?.show(
+        error.message || "Error al actualizar el perfil",
+        "error"
+      );
+    }
+  } finally {
+    isSaving = false;
+    if (saveBtn) saveBtn.disabled = false;
+    if (spinner) spinner.style.display = "none";
+    updateSaveButtonState();
+  }
+}
+
+/**
+ * Manejar cambio de contraseña
+ */
+async function handlePasswordSubmit(e) {
+  e.preventDefault();
+
+  if (isChangingPassword) return;
+
+  // Validar todos los campos
+  const fields = ["currentPassword", "newPassword", "confirmPassword"];
+  const allValid = fields.every((fieldName) =>
+    validatePasswordField(fieldName)
+  );
+
+  if (!allValid) {
+    window.toast?.show(
+      "Por favor, corrige los errores en el formulario",
+      "error"
+    );
+    return;
+  }
+
+  isChangingPassword = true;
+  const btn = document.getElementById("change-password-btn");
+  const spinner = document.getElementById("password-spinner");
+
+  if (btn) btn.disabled = true;
+  if (spinner) spinner.style.display = "inline-block";
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token no encontrado");
+    }
+
+    const formData = {
+      currentPassword: document.getElementById("currentPassword").value,
+      newPassword: document.getElementById("newPassword").value,
+      confirmPassword: document.getElementById("confirmPassword").value,
+    };
+
+    const response = await fetch(`${API_BASE_URL}/users/me/password`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.toast?.show("Tu sesión ha expirado", "warning");
+      navigate("login");
+      return;
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al cambiar la contraseña");
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Limpiar formulario
+      document.getElementById("change-password-form").reset();
+
+      // Limpiar errores
+      fields.forEach((fieldName) => {
+        const errorElement = document.getElementById(`${fieldName}-error`);
+        const field = document.getElementById(fieldName);
+        if (errorElement) errorElement.textContent = "";
+        if (field) field.classList.remove("error");
+      });
+
+      window.toast?.show("Contraseña actualizada exitosamente", "success");
+    } else {
+      throw new Error("Respuesta inválida del servidor");
+    }
+  } catch (error) {
+    console.error("Error changing password:", error);
+    window.toast?.show(
+      error.message || "Error al cambiar la contraseña",
+      "error"
+    );
+  } finally {
+    isChangingPassword = false;
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = "none";
+    updatePasswordButtonState();
+  }
+}
+
+/**
+ * Mostrar formulario de cambio de contraseña
+ */
+function showPasswordForm() {
+  const linkContainer = document.getElementById("password-link-container");
+  const formContainer = document.getElementById("password-form-container");
+
+  if (linkContainer && formContainer) {
+    linkContainer.style.display = "none";
+    formContainer.style.display = "block";
+
+    // Hacer scroll suave al formulario
+    formContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+/**
+ * Ocultar formulario de cambio de contraseña
+ */
+function hidePasswordForm() {
+  const linkContainer = document.getElementById("password-link-container");
+  const formContainer = document.getElementById("password-form-container");
+  const passwordForm = document.getElementById("change-password-form");
+
+  if (linkContainer && formContainer) {
+    formContainer.style.display = "none";
+    linkContainer.style.display = "block";
+
+    // Limpiar formulario
+    if (passwordForm) {
+      passwordForm.reset();
+
+      // Limpiar errores
+      const fields = ["currentPassword", "newPassword", "confirmPassword"];
+      fields.forEach((fieldName) => {
+        const errorElement = document.getElementById(`${fieldName}-error`);
+        const field = document.getElementById(fieldName);
+        if (errorElement) errorElement.textContent = "";
+        if (field) field.classList.remove("error");
+      });
+
+      // Resetear estado del botón
+      updatePasswordButtonState();
+    }
+  }
+}
+
+/**
+ * Manejar logout
+ */
+function handleLogout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.toast?.show("Sesión cerrada exitosamente", "success");
+  navigate("home");
+}
+
+// Exportar función de inicialización
+export default initProfileEdit;
