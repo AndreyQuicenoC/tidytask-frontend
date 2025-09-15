@@ -444,19 +444,19 @@ export default function setupSignup() {
   });
 
   // Navegar a login
-  const goLoginButton = document.getElementById("go-login");
-  if (goLoginButton) {
-    goLoginButton.addEventListener("click", (e) => {
+  const goLoginBtn = document.getElementById("go-login");
+  if (goLoginBtn) {
+    goLoginBtn.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Botón go-login clickeado, navegando a login...");
-      // Limpiar intervalos antes de navegar (igual que en login)
+      // Limpiar intervalos antes de navegar
       if (window.cleanupLoginIntervals) {
         window.cleanupLoginIntervals();
       }
       navigateTo("login", true);
     });
   } else {
-    console.error("Botón go-login no encontrado en signup");
+    console.error("Elemento go-login no encontrado en signup.js");
   }
 
   // Navegar al home
@@ -465,7 +465,7 @@ export default function setupSignup() {
     goHomeButton.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Botón go-home clickeado, navegando a home...");
-      // Limpiar intervalos antes de navegar (igual que en login)
+      // Limpiar intervalos antes de navegar
       if (window.cleanupLoginIntervals) {
         window.cleanupLoginIntervals();
       }
@@ -498,7 +498,7 @@ export default function setupSignup() {
       // Configurar el verificador de estado
       auth.checkAuthStatus((error, user) => {
         // Restablecer botón en cualquier caso
-        buttonText.textContent = "Registrarse";
+        buttonText.textContent = "Crear Cuenta";
         spinner.classList.add("hidden");
         submitButton.disabled = false;
 
@@ -510,10 +510,8 @@ export default function setupSignup() {
 
         if (user) {
           console.log("Autenticación con Google exitosa");
-
           // Mostrar toast y redirigir al dashboard
           toast.success(`¡Bienvenido, ${user.firstName}!`);
-
           // Redirigir al dashboard después de un breve momento
           setTimeout(() => {
             navigateTo("dashboard");
