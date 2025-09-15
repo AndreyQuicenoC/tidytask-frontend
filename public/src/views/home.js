@@ -186,13 +186,31 @@ function setupHamburgerMenu() {
   });
 
   // Cerrar menú al hacer clic en los botones de navegación
-  const navButtons = headerNav.querySelectorAll("button");
+  const navButtons = headerNav.querySelectorAll("button, .nav-link");
   navButtons.forEach(button => {
     button.addEventListener("click", () => {
       hamburgerBtn.classList.remove("active");
       headerNav.classList.remove("active");
     });
   });
+
+  // Event listeners específicos para botones móviles
+  const mobileLoginButton = document.getElementById("mobile-login-button");
+  const mobileSignupButton = document.getElementById("mobile-signup-button");
+
+  if (mobileLoginButton) {
+    mobileLoginButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigate("login");
+    });
+  }
+
+  if (mobileSignupButton) {
+    mobileSignupButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigate("signup");
+    });
+  }
 
   // Cerrar menú al hacer clic fuera de él
   document.addEventListener("click", (e) => {
