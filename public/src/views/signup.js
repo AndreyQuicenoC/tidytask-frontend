@@ -443,21 +443,35 @@ export default function setupSignup() {
     }
   });
 
-  // Navegar a login
-  const goLoginButton = document.getElementById("go-login");
-  if (goLoginButton) {
-    goLoginButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("Botón go-login clickeado, navegando a login...");
-      // Limpiar intervalos antes de navegar (igual que en login)
-      if (window.cleanupLoginIntervals) {
-        window.cleanupLoginIntervals();
-      }
-      navigateTo("login", true);
-    });
-  } else {
-    console.error("Botón go-login no encontrado en signup");
-  }
+
+  document.getElementById("go-login").addEventListener("click", (e) => {
+    e.preventDefault();
+    navigateTo("login");
+  });
+
+  // Botón de signup con Google
+  const googleLoginButton = document.querySelector(".google-login");
+  if (googleLoginButton) {
+    googleLoginButton.addEventListener("click", () => {
+      // URL específica para Google Auth (usar la URL correcta según el entorno)
+      const isProduction = window.location.hostname !== "localhost";
+      const baseUrl = isProduction
+        ? "https://tidytasks-80b95fdaeb61.herokuapp.com"
+        : "http://localhost:3001";
+      const googleAuthUrl = `${baseUrl}/api/auth/google`;
+
+    // Mostrar spinner durante la autenticación
+    buttonText.textContent = "Autenticando...";
+    spinner.classList.remove("hidden");
+    submitButton.disabled = true; // Usar el nuevo método seguro para iniciar la autenticación
+    const auth = initiateGoogleAuth(googleAuthUrl);
+
+    // Configurar el verificador de estado
+    auth.checkAuthStatus((error, user) => {
+      // Restablecer botón en cualquier caso
+      buttonText.textContent = "Registrarse";
+      spinner.classList.add("hidden");
+      submitButton.disabled = false;
 
   // Navegar al home
   const goHomeButton = document.getElementById("go-home");
