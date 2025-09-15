@@ -357,7 +357,7 @@ body {
   }
 
   /* Mostrar navegación cuando está activa */
-  .header-nav.active {
+  .header-nav.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);

@@ -1,4 +1,4 @@
-import { navigateTo } from "../router.js";
+import { navigate } from "../router.js";
 import toast from "../utils/toast.js";
 
 export default function setupHome() {
@@ -22,7 +22,7 @@ export default function setupHome() {
   if (loginButton) {
     loginButton.addEventListener("click", () => {
       console.log("Navegando a login desde header");
-      navigateTo("login");
+      navigate("login");
     });
   }
 
@@ -31,7 +31,7 @@ export default function setupHome() {
   if (signupButton) {
     signupButton.addEventListener("click", () => {
       console.log("Navegando a signup desde header");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -40,7 +40,7 @@ export default function setupHome() {
   if (getStartedButton) {
     getStartedButton.addEventListener("click", () => {
       console.log("Navegando a signup desde hero");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -63,7 +63,7 @@ export default function setupHome() {
   if (ctaSignupButton) {
     ctaSignupButton.addEventListener("click", () => {
       console.log("Navegando a signup desde CTA");
-      navigateTo("signup");
+      navigate("signup");
     });
   }
 
@@ -101,7 +101,7 @@ function updateHeaderForLoggedUser() {
           hamburgerBtn.classList.remove("active");
           headerNav.classList.remove("active");
         }
-        navigateTo("dashboard");
+        navigate("dashboard");
       });
     }
   }
@@ -177,28 +177,46 @@ function setupHamburgerMenu() {
     if (isActive) {
       // Cerrar menú
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     } else {
       // Abrir menú
       hamburgerBtn.classList.add("active");
-      headerNav.classList.add("active");
+      headerNav.classList.add("open");
     }
   });
 
   // Cerrar menú al hacer clic en los botones de navegación
-  const navButtons = headerNav.querySelectorAll("button");
+  const navButtons = headerNav.querySelectorAll("button, .nav-link");
   navButtons.forEach(button => {
     button.addEventListener("click", () => {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     });
   });
+
+  // Event listeners específicos para botones móviles
+  const mobileLoginButton = document.getElementById("mobile-login-button");
+  const mobileSignupButton = document.getElementById("mobile-signup-button");
+
+  if (mobileLoginButton) {
+    mobileLoginButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigate("login");
+    });
+  }
+
+  if (mobileSignupButton) {
+    mobileSignupButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigate("signup");
+    });
+  }
 
   // Cerrar menú al hacer clic fuera de él
   document.addEventListener("click", (e) => {
     if (!hamburgerBtn.contains(e.target) && !headerNav.contains(e.target)) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 
@@ -206,15 +224,15 @@ function setupHamburgerMenu() {
   window.addEventListener("resize", () => {
     if (window.innerWidth > 768) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 
   // Cerrar menú con tecla ESC
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && headerNav.classList.contains("active")) {
+    if (e.key === "Escape" && headerNav.classList.contains("open")) {
       hamburgerBtn.classList.remove("active");
-      headerNav.classList.remove("active");
+      headerNav.classList.remove("open");
     }
   });
 }
