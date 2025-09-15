@@ -4,15 +4,103 @@
 
 <!-- Header fijo en la parte superior -->
 <header class="app-header">
-  <div class="user-avatar">
+  <div class="user-avatar" id="user-avatar-container">
     <span id="user-avatar-letter">A</span>
   </div>
   <div class="user-display">
     <span id="user-name">Nombre de usuario</span>
   </div>
-  <button id="logout-button" class="log-out-button float-animation">
-    Cerrar sesión
-  </button>
+
+  <!-- Desktop actions -->
+  <div class="header-actions desktop-only">
+    <button id="profile-button" class="profile-button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      Mi perfil
+    </button>
+    <button id="logout-button" class="log-out-button float-animation">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16,17 21,12 16,7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Cerrar sesión
+    </button>
+  </div>
+
+  <!-- Mobile hamburger menu -->
+  <div class="mobile-menu mobile-only">
+    <button id="hamburger-button" class="hamburger-button">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Mobile dropdown menu -->
+    <div id="mobile-dropdown" class="mobile-dropdown">
+      <div class="mobile-menu-item">
+        <button id="mobile-profile-button" class="mobile-menu-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Mi perfil
+        </button>
+      </div>
+      <div class="mobile-menu-item">
+        <button id="mobile-logout-button" class="mobile-menu-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16,17 21,12 16,7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </div>
 </header>
 
 <div class="dashboard-container">
@@ -21,27 +109,44 @@
     <!-- Sección de título y conteo de tareas con botón de nueva tarea -->
     <div class="tasks-header">
       <div class="tasks-title-section">
-        <h1>Mis tareas</h1>
-        <span id="task-counter">0 tareas creadas</span>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+          "
+        >
+          <div>
+            <h1>Mis tareas</h1>
+            <span id="task-counter">0 tareas creadas</span>
+          </div>
+          <div>
+            <button
+              id="new-task-button"
+              class="new-task-button pulse-animation"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Crear tarea
+            </button>
+          </div>
+        </div>
       </div>
       <div id="new-task-button-container" style="display: none">
-        <button id="new-task-button" class="new-task-button pulse-animation">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Nueva tarea
-        </button>
+        <!-- Contenedor oculto mantenido para compatibilidad con el JS existente -->
       </div>
     </div>
     <!-- Contenedor de tareas principal - puede cambiar según el estado -->
