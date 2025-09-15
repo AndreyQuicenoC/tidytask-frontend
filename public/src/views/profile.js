@@ -1,6 +1,5 @@
 import { navigate } from "../router.js";
-
-const API_BASE_URL = "/api";
+import { get, del } from "../services/api.js";
 
 // Estado de la aplicación
 let userProfile = null;
@@ -128,34 +127,8 @@ async function loadUserProfile() {
       throw new Error("Token no encontrado");
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.status === 401) {
-      // Token expirado
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.toast?.show(
-        "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
-        "warning"
-      );
-      navigate("login");
-      return;
-    }
-
-    if (!response.ok) {
-      if (response.status >= 500) {
-        throw new Error("Error del servidor");
-      }
-      throw new Error("Error al obtener el perfil");
-    }
-
-    const data = await response.json();
+    // Usar el servicio API en lugar de fetch directo
+    const data = await get("/users/me", true);
 
     if (data.success && data.data) {
       userProfile = data.data;
@@ -319,25 +292,8 @@ async function handleDeleteAccount() {
       throw new Error("Token no encontrado");
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/me`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.toast?.show("Tu sesión ha expirado", "warning");
-      navigate("login");
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error("Error al eliminar la cuenta");
-    }
+    // Usar el servicio API en lugar de fetch directo
+    await del("/users/me", true);
 
     // Cuenta eliminada exitosamente
     localStorage.removeItem("token");
