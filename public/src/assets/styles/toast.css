@@ -4,8 +4,9 @@
 /* Contenedor principal de toasts */
 .toast-container {
   position: fixed;
-  top: 20px;
+  top: 90%; /* Cambiado de 20px a 50% para centrar verticalmente */
   right: 20px;
+  transform: translateY(-50%); /* Centrar verticalmente */
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -140,9 +141,10 @@
 /* Media queries para responsividad */
 @media (max-width: 768px) {
   .toast-container {
-    top: 10px;
+    top: 90%; /* Mantener centrado verticalmente */
     right: 10px;
     left: 10px;
+    transform: translateY(-50%); /* Mantener centrado verticalmente */
     max-width: none;
   }
 
@@ -154,9 +156,10 @@
 
 @media (max-width: 480px) {
   .toast-container {
-    top: 5px;
+    top: 90%; /* Mantener centrado verticalmente */
     right: 5px;
     left: 5px;
+    transform: translateY(-50%); /* Mantener centrado verticalmente */
   }
 
   .toast {
