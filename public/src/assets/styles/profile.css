@@ -182,10 +182,41 @@
   border-top: 1px solid #e2e8f0;
 }
 
+/* Transiciones suaves para el formulario de contraseña */
+.password-link-card {
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.password-link-card.hiding {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.profile-edit-card {
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  max-height: 0;
+  overflow: hidden;
+}
+
+.profile-edit-card.showing {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 600px;
+  overflow: visible;
+}
+
 @media (max-width: 768px) {
   .password-section {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
+  }
+  
+  .profile-edit-card.showing {
+    max-height: 700px;
   }
 }
 
