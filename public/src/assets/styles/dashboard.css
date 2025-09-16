@@ -707,7 +707,7 @@
 
   /* Flecha indicadora del dropdown */
   .header-nav::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -8px;
     right: 20px;
@@ -731,7 +731,7 @@
     display: none;
   }
 
-  /* Estilos para los botones dentro del menú hamburguesa */  
+  /* Estilos para los botones dentro del menú hamburguesa */
   .header-nav .btn-float {
     width: 100%;
     justify-content: flex-start;
@@ -745,17 +745,17 @@
     font-size: 0.95rem;
     box-shadow: none;
   }
-  
+
   .header-nav .btn-float:last-child {
     border-bottom: none;
   }
-  
+
   .header-nav .btn-float:hover {
     background-color: rgba(0, 0, 0, 0.05);
     box-shadow: none;
     transform: none;
   }
-  
+
   .header-nav .btn-float svg {
     color: #6b7280;
   }
@@ -800,12 +800,12 @@
   }
 
   .dashboard-container {
-    padding-top: 65px;
+    padding-top: 30px;
     width: 100%;
   }
 
   .tasks-main-card {
-    width: 100%; /* Ocupar todo el ancho disponible */
+    width: 95%; /* Ocupar todo el ancho disponible */
     max-width: none; /* Sin límite de ancho máximo */
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
@@ -905,7 +905,7 @@
 
   .tasks-main-card {
     padding: 12px; /* Reducir padding */
-    border-radius: 4px;
+    border-radius: 10px;
     margin: 10px auto 0 auto;
   }
 
