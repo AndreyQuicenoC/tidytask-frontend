@@ -5,6 +5,22 @@ import { get, post, put, del } from "../services/api.js";
 import toast from "../utils/toast.js";
 import { checkAuth } from "../utils/page-loader.js";
 
+/**
+ * Valida el formato de tiempo según especificaciones del backend
+ * @param {string} time - Tiempo en formato HH:MM
+ * @returns {boolean} - True si es válido, false si no
+ */
+function validateTime(time) {
+  if (!time || time === '') return true; // Opcional
+  
+  const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  
+  if (!timeRegex.test(time)) return false;
+  
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
+}
+
 export default function setupDashboard() {
   // Verificar si el usuario está autenticado
   if (!checkAuth(true)) {
@@ -818,7 +834,11 @@ export default function setupDashboard() {
     // Formatear hora si existe
     let formattedTime = "";
     if (task.time) {
-      formattedTime = task.time;
+      // Convertir formato 24h a 12h para mostrar
+      const [hours, minutes] = task.time.split(':');
+      const hour12 = parseInt(hours) % 12 || 12;
+      const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+      formattedTime = `${hour12}:${minutes} ${ampm}`;
     }
 
     // Mapear estado en inglés para mostrar en la UI
@@ -925,11 +945,8 @@ export default function setupDashboard() {
     document.getElementById("task-date").value = formattedDate;
     document.getElementById("task-date").min = formattedDate;
 
-    // Establecer hora por defecto (ahora)
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    document.getElementById("task-time").value = `${hours}:${minutes}`;
+    // Establecer hora por defecto (opcional - dejar vacío)
+    document.getElementById("task-time").value = "";
 
     // Estado por defecto: 'Por hacer' y deshabilitar el select
     const statusSelect = document.getElementById("task-status");
@@ -962,13 +979,12 @@ export default function setupDashboard() {
     const formattedDate = dueDate.toISOString().split("T")[0];
     document.getElementById("task-date").value = formattedDate;
 
-    // Formatear hora si existe, de lo contrario hora actual
+    // Formatear hora si existe, de lo contrario dejar vacío
     if (task.time) {
       document.getElementById("task-time").value = task.time;
     } else {
-      const hours = String(dueDate.getHours()).padStart(2, "0");
-      const minutes = String(dueDate.getMinutes()).padStart(2, "0");
-      document.getElementById("task-time").value = `${hours}:${minutes}`;
+      // Dejar vacío si no hay tiempo, ya que es opcional
+      document.getElementById("task-time").value = "";
     }
 
     // Habilitar el select de estado y establecer el valor actual
@@ -1044,9 +1060,11 @@ export default function setupDashboard() {
       errors.date = "Completa este campo";
     }
 
-    // Validación de hora
-    if (!time) {
-      errors.time = "Completa este campo";
+    // Validación de hora (opcional)
+    if (time && time.trim() !== "") {
+      if (!validateTime(time)) {
+        errors.time = "Formato inválido. Usa HH:MM (ej: 14:30)";
+      }
     }
 
     // Validación de estado
@@ -1175,7 +1193,7 @@ export default function setupDashboard() {
       title: document.getElementById("task-title").value.trim(),
       detail: document.getElementById("task-detail").value.trim(),
       date: document.getElementById("task-date").value,
-      time: document.getElementById("task-time").value,
+      time: document.getElementById("task-time").value.trim() || undefined,
       status: document.getElementById("task-status").value,
     };
 
