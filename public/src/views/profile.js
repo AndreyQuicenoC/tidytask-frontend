@@ -96,12 +96,30 @@ function setupEventListeners() {
   const showPasswordBtn = document.getElementById("show-password-form");
   const hidePasswordBtn = document.getElementById("hide-password-form");
 
+  console.log("Setting up password form buttons");
+  console.log("showPasswordBtn:", showPasswordBtn);
+  console.log("hidePasswordBtn:", hidePasswordBtn);
+
   if (showPasswordBtn) {
-    showPasswordBtn.addEventListener("click", showPasswordForm);
+    showPasswordBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      console.log("Show password button clicked");
+      showPasswordForm();
+    });
+    console.log("Show password button event listener added");
+  } else {
+    console.error("Show password button not found");
   }
 
   if (hidePasswordBtn) {
-    hidePasswordBtn.addEventListener("click", hidePasswordForm);
+    hidePasswordBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      console.log("Hide password button clicked");
+      hidePasswordForm();
+    });
+    console.log("Hide password button event listener added");
+  } else {
+    console.error("Hide password button not found");
   }
 
   // Botón de eliminar cuenta
@@ -181,6 +199,7 @@ function setupDeleteModal() {
 async function loadUserProfile() {
   if (isLoading) return;
 
+  console.log("loadUserProfile called");
   isLoading = true;
   showSkeleton();
 
@@ -190,15 +209,19 @@ async function loadUserProfile() {
       throw new Error("Token no encontrado");
     }
 
+    console.log("Making API call to /users/me");
     // Usar el servicio API en lugar de fetch directo
     const data = await get("/users/me", true);
+    console.log("API response:", data);
 
     if (data.success && data.data) {
       userProfile = data.data;
+      console.log("Profile data loaded successfully:", userProfile);
       displayProfile(userProfile);
       updateHeaderInfo(userProfile);
       updateNavInfo(userProfile); // Agregar actualización del nav
     } else {
+      console.error("Invalid profile data:", data);
       throw new Error("Datos de perfil no válidos");
     }
   } catch (error) {
@@ -235,6 +258,8 @@ function showSkeleton() {
  * Mostrar contenido del perfil
  */
 function displayProfile(profile) {
+  console.log("displayProfile called with:", profile);
+  
   const skeleton = document.getElementById("profile-skeleton");
   const content = document.getElementById("profile-content");
   const error = document.getElementById("profile-error");
@@ -250,16 +275,39 @@ function displayProfile(profile) {
   const emailInput = document.getElementById("profile-email");
   const memberSinceElement = document.getElementById("profile-member-since");
 
-  if (firstNameInput) firstNameInput.value = profile.firstName;
-  if (lastNameInput) lastNameInput.value = profile.lastName;
-  if (ageInput) ageInput.value = profile.age.toString();
-  if (emailInput) emailInput.value = profile.email;
-  if (memberSinceElement) memberSinceElement.textContent = formatDate(profile.createdAt);
+  console.log("Form elements found:");
+  console.log("firstNameInput:", firstNameInput);
+  console.log("lastNameInput:", lastNameInput);
+  console.log("ageInput:", ageInput);
+  console.log("emailInput:", emailInput);
+  console.log("memberSinceElement:", memberSinceElement);
+
+  if (firstNameInput) {
+    firstNameInput.value = profile.firstName;
+    console.log("Set firstName:", profile.firstName);
+  }
+  if (lastNameInput) {
+    lastNameInput.value = profile.lastName;
+    console.log("Set lastName:", profile.lastName);
+  }
+  if (ageInput) {
+    ageInput.value = profile.age.toString();
+    console.log("Set age:", profile.age);
+  }
+  if (emailInput) {
+    emailInput.value = profile.email;
+    console.log("Set email:", profile.email);
+  }
+  if (memberSinceElement) {
+    memberSinceElement.textContent = formatDate(profile.createdAt);
+    console.log("Set memberSince:", formatDate(profile.createdAt));
+  }
 
   // Actualizar avatar
   const avatarLetter = document.getElementById("profile-avatar-letter");
   if (avatarLetter) {
     avatarLetter.textContent = profile.firstName.charAt(0).toUpperCase();
+    console.log("Set avatar letter:", profile.firstName.charAt(0).toUpperCase());
   }
 }
 
@@ -726,15 +774,38 @@ async function handlePasswordSubmit(e) {
  * Mostrar formulario de cambio de contraseña
  */
 function showPasswordForm() {
+  console.log("showPasswordForm called");
   const linkContainer = document.getElementById("password-link-container");
   const formContainer = document.getElementById("password-form-container");
 
-  if (linkContainer && formContainer) {
-    linkContainer.style.display = "none";
-    formContainer.style.display = "block";
+  console.log("linkContainer:", linkContainer);
+  console.log("formContainer:", formContainer);
 
-    // Hacer scroll suave al formulario
-    formContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (linkContainer && formContainer) {
+    console.log("Both containers found, showing password form");
+    
+    // Agregar clase de ocultamiento al enlace
+    linkContainer.classList.add("hiding");
+    
+    // Después de la transición de ocultamiento, ocultar completamente y mostrar formulario
+    setTimeout(() => {
+      linkContainer.style.display = "none";
+      formContainer.style.display = "block";
+      
+      // Pequeño delay para que el display: block tome efecto
+      setTimeout(() => {
+        formContainer.classList.add("showing");
+        
+        // Hacer scroll suave al formulario después de la animación
+        setTimeout(() => {
+          formContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 200);
+      }, 50);
+    }, 300);
+  } else {
+    console.error("Password form containers not found");
+    console.error("linkContainer:", linkContainer);
+    console.error("formContainer:", formContainer);
   }
 }
 
@@ -742,13 +813,27 @@ function showPasswordForm() {
  * Ocultar formulario de cambio de contraseña
  */
 function hidePasswordForm() {
+  console.log("hidePasswordForm called");
   const linkContainer = document.getElementById("password-link-container");
   const formContainer = document.getElementById("password-form-container");
   const passwordForm = document.getElementById("change-password-form");
 
   if (linkContainer && formContainer) {
-    formContainer.style.display = "none";
-    linkContainer.style.display = "block";
+    console.log("Hiding password form with animation");
+    
+    // Quitar clase de mostrado del formulario
+    formContainer.classList.remove("showing");
+    
+    // Después de la transición, ocultar formulario y mostrar enlace
+    setTimeout(() => {
+      formContainer.style.display = "none";
+      linkContainer.style.display = "block";
+      
+      // Quitar clase de ocultamiento del enlace
+      setTimeout(() => {
+        linkContainer.classList.remove("hiding");
+      }, 50);
+    }, 400);
 
     // Limpiar formulario
     if (passwordForm) {
