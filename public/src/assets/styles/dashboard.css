@@ -33,6 +33,7 @@
 .tasks-main-card {
   width: 100%;
   max-width: 1400px; /* Aumentar el ancho máximo */
+  height: 900px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -187,7 +188,7 @@
 .btn-secondary {
   background: transparent;
   color: #8463f9;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   border: 2px solid #8463f9;
   border-radius: 8px;
   font-weight: 600;
@@ -345,6 +346,7 @@
 /* Kanban Board */
 .kanban-board {
   display: grid;
+  min-height: 750px;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: var(--spacing-xl);
@@ -906,7 +908,8 @@
   .tasks-main-card {
     padding: 12px; /* Reducir padding */
     border-radius: 10px;
-    margin: 10px auto 0 auto;
+    margin: 10px auto 50px auto;
+    height: 850px;
   }
 
   .user-display {

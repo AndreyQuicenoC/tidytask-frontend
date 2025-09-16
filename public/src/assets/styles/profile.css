@@ -117,11 +117,6 @@
 
 .info-value {
   font-size: 0.9rem; /* Reducido de 1.125rem a 0.9rem (-20%) */
-  color: #2d3748;
-  padding: 0.6rem 0.8rem; /* Reducido de 0.75rem 1rem a 0.6rem 0.8rem (-20%) */
-  background: #f8fafc;
-  border-radius: 6px; /* Reducido de 8px a 6px (-25%) */
-  border: 1px solid #e2e8f0;
 }
 
 /* Acciones del perfil */
@@ -318,7 +313,6 @@
 /* Formulario de edición */
 .edit-form {
   display: grid;
-  gap: 1.2rem; /* Reducido de 1.5rem a 1.2rem (-20%) */
 }
 
 .form-field {
@@ -361,7 +355,6 @@
   color: #ef4444;
   font-size: 0.875rem;
   font-weight: 500;
-  min-height: 1.25rem;
 }
 
 .field-help {
