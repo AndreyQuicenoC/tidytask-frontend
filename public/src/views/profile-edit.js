@@ -46,7 +46,9 @@ function initProfileEdit() {
 
   // Prevenir múltiples inicializaciones de datos, pero siempre configurar event listeners
   if (isInitialized) {
-    console.log("Profile-edit ya inicializado, reconfigurando listeners y cargando datos...");
+    console.log(
+      "Profile-edit ya inicializado, reconfigurando listeners y cargando datos..."
+    );
     setupEventListeners(); // Siempre reconfigurar listeners
     loadProfileData();
     return;
@@ -75,7 +77,7 @@ function setupEventListeners() {
   // Botón de volver
   const backBtn = document.getElementById("back-btn");
   if (backBtn) {
-    backBtn.addEventListener("click", function(e) {
+    backBtn.addEventListener("click", function (e) {
       e.preventDefault();
       console.log("Botón volver al perfil clickeado");
       try {
@@ -90,7 +92,7 @@ function setupEventListeners() {
   // Botón de cancelar
   const cancelBtn = document.getElementById("cancel-btn");
   if (cancelBtn) {
-    cancelBtn.addEventListener("click", function(e) {
+    cancelBtn.addEventListener("click", function (e) {
       e.preventDefault();
       console.log("Botón cancelar clickeado");
       try {
@@ -111,7 +113,7 @@ function setupEventListeners() {
   // Botón de logout
   const logoutBtn = document.getElementById("logout-button");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", function(e) {
+    logoutBtn.addEventListener("click", function (e) {
       e.preventDefault();
       console.log("Botón logout clickeado en profile-edit");
       try {
@@ -323,15 +325,15 @@ function updateNavInfo(profile) {
   // Los elementos ya se actualizan en updateHeaderInfo
   // Pero agreguemos logs para debugging
   console.log("Actualizando info del nav en profile-edit con perfil:", profile);
-  
+
   // También actualizar localStorage para que otros componentes lo usen
   const userData = {
     firstName: profile.firstName,
     lastName: profile.lastName,
     email: profile.email,
-    age: profile.age
+    age: profile.age,
   };
-  
+
   localStorage.setItem("user", JSON.stringify(userData));
   console.log("Datos de usuario guardados en localStorage desde profile-edit");
 }
@@ -373,9 +375,9 @@ function validateField(fieldName) {
       } else if (age < 13) {
         isValid = false;
         errorMessage = "Debes tener al menos 13 años";
-      } else if (age > 120) {
+      } else if (age > 100) {
         isValid = false;
-        errorMessage = "Edad no válida";
+        errorMessage = "La edad debe ser menor o igual a 100 años";
       }
       break;
 
@@ -431,7 +433,8 @@ function validatePasswordField(fieldName) {
         errorMessage = "Debe contener al menos un número";
       } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) {
         isValid = false;
-        errorMessage = "Debe contener al menos un carácter especial (!@#$%^&*()_+=-[]{}|;':\",./<>?)";
+        errorMessage =
+          "Debe contener al menos un carácter especial (!@#$%^&*()_+=-[]{}|;':\",./<>?)";
       } else if (!/(?=.*[a-z])/.test(value)) {
         isValid = false;
         errorMessage = "Debe contener al menos una letra minúscula";
@@ -572,7 +575,7 @@ async function handleProfileSubmit(e) {
       updateNavInfo(data.data);
 
       window.toast?.show("Perfil actualizado exitosamente", "success");
-      
+
       // Resetear estado del perfil antes de navegar para forzar recarga
       resetProfileState();
       navigate("profile");
@@ -679,7 +682,7 @@ async function handlePasswordSubmit(e) {
     isChangingPassword = false;
     if (btn) btn.disabled = false;
     if (spinner) spinner.style.display = "none";
-    
+
     // Solo actualizar estado del botón si no fue exitoso
     if (!wasSuccessful) {
       updatePasswordButtonState();

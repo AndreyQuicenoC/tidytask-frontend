@@ -137,9 +137,6 @@
 
   /* Mobile tasks container with grid layout for 2 columns */
   .tasks-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
     padding: 0;
     overflow-y: auto;
     max-height: 60vh;
@@ -160,6 +157,7 @@
     box-sizing: border-box;
     width: 100%;
     height: 130px;
+    margin-bottom: 15px;
   }
 
   .task-card:hover {

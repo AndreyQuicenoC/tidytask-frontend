@@ -922,6 +922,7 @@ export default function setupDashboard() {
    * Abre el modal para crear una nueva tarea
    */
   function openNewTaskModal() {
+    elements.saveTaskButton.textContent = "Guardar tarea";
     // Verificar si el modal y elementos necesarios existen
     if (!elements.modalTitle || !elements.taskForm || !elements.newTaskModal) {
       console.error("Modal elements not found");

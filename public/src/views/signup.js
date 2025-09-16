@@ -156,6 +156,17 @@ export default function setupSignup() {
       return false;
     }
 
+    if (age > 100) {
+      if (showErrors && hasAttemptedSubmit) {
+        showError(
+          input,
+          errorElement,
+          "La edad debe ser menor o igual a 100 años"
+        );
+      }
+      return false;
+    }
+
     if (hasAttemptedSubmit) {
       markValid(input);
     }
