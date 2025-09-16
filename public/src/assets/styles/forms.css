@@ -4,12 +4,12 @@
 /* Form Fields y Labels */
 .form-field {
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 19px; /* Reducido de 24px a 19px (-21%) */
 }
 
 .form-label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px; /* Reducido de 8px a 6px (-25%) */
   font-weight: 600;
   position: relative;
   z-index: 2;
@@ -21,16 +21,16 @@
   position: relative;
   background-color: #f8d7da;
   color: #721c24;
-  border-radius: 4px;
-  padding: 6px 10px;
-  font-size: 12px;
-  margin-top: 4px;
+  border-radius: 3px; /* Reducido de 4px a 3px (-25%) */
+  padding: 5px 8px; /* Reducido de 6px 10px a 5px 8px (-20%) */
+  font-size: 10px; /* Reducido de 12px a 10px (-17%) */
+  margin-top: 3px; /* Reducido de 4px a 3px (-25%) */
   width: 100%;
 }
 
 .tooltip-error.visible {
   display: block;
-  margin-top: 8px;
+  margin-top: 6px; /* Reducido de 8px a 6px (-25%) */
 }
 
 input.error {
@@ -52,11 +52,11 @@ input.valid {
   .form-field {
     margin-bottom: 20px;
   }
-  
+
   .form-label {
     font-size: 0.95rem;
   }
-  
+
   .tooltip-error {
     font-size: 11px;
     padding: 5px 8px;
@@ -67,12 +67,12 @@ input.valid {
   .form-field {
     margin-bottom: 16px;
   }
-  
+
   .form-label {
     font-size: 0.9rem;
     margin-bottom: 6px;
   }
-  
+
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -83,7 +83,7 @@ input.valid {
     font-size: 14px;
     padding: 8px 10px;
   }
-  
+
   .tooltip-error {
     font-size: 10px;
     padding: 4px 6px;
@@ -94,11 +94,11 @@ input.valid {
   .form-field {
     margin-bottom: 12px;
   }
-  
+
   .form-label {
     font-size: 0.85rem;
   }
-  
+
   input[type="text"],
   input[type="email"],
   input[type="password"],

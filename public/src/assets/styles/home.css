@@ -344,7 +344,7 @@ body {
 
   /* Flecha indicadora del dropdown */
   .header-nav::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -8px;
     right: 20px;
@@ -425,7 +425,7 @@ body {
 
 @media (max-width: 480px) {
   .hero-section {
-    padding: 1rem;
+    padding: 0rem;
   }
 
   .hero-title {
@@ -438,6 +438,7 @@ body {
 
   .btn-large {
     width: 100%;
+    justify-content: center;
   }
 
   /* Ajustes específicos para el dropdown en pantallas muy pequeñas */

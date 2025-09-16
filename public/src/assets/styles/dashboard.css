@@ -33,6 +33,7 @@
 .tasks-main-card {
   width: 100%;
   max-width: 1400px; /* Aumentar el ancho máximo */
+  height: 900px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -187,7 +188,7 @@
 .btn-secondary {
   background: transparent;
   color: #8463f9;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.5rem;
   border: 2px solid #8463f9;
   border-radius: 8px;
   font-weight: 600;
@@ -345,6 +346,7 @@
 /* Kanban Board */
 .kanban-board {
   display: grid;
+  min-height: 750px;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 20px;
   margin-bottom: var(--spacing-xl);
@@ -707,7 +709,7 @@
 
   /* Flecha indicadora del dropdown */
   .header-nav::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -8px;
     right: 20px;
@@ -731,7 +733,7 @@
     display: none;
   }
 
-  /* Estilos para los botones dentro del menú hamburguesa */  
+  /* Estilos para los botones dentro del menú hamburguesa */
   .header-nav .btn-float {
     width: 100%;
     justify-content: flex-start;
@@ -745,17 +747,17 @@
     font-size: 0.95rem;
     box-shadow: none;
   }
-  
+
   .header-nav .btn-float:last-child {
     border-bottom: none;
   }
-  
+
   .header-nav .btn-float:hover {
     background-color: rgba(0, 0, 0, 0.05);
     box-shadow: none;
     transform: none;
   }
-  
+
   .header-nav .btn-float svg {
     color: #6b7280;
   }
@@ -800,12 +802,12 @@
   }
 
   .dashboard-container {
-    padding-top: 65px;
+    padding-top: 30px;
     width: 100%;
   }
 
   .tasks-main-card {
-    width: 100%; /* Ocupar todo el ancho disponible */
+    width: 95%; /* Ocupar todo el ancho disponible */
     max-width: none; /* Sin límite de ancho máximo */
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
@@ -905,8 +907,9 @@
 
   .tasks-main-card {
     padding: 12px; /* Reducir padding */
-    border-radius: 4px;
-    margin: 10px auto 0 auto;
+    border-radius: 10px;
+    margin: 10px auto 50px auto;
+    height: 850px;
   }
 
   .user-display {
