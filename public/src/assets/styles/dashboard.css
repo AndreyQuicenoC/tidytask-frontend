@@ -812,7 +812,7 @@
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
     margin: 15px auto 5px auto;
-    height: 550px;
+    height: 850px;
   }
 
   .kanban-board {

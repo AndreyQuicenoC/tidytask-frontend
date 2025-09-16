@@ -11,13 +11,13 @@ import { checkAuth } from "../utils/page-loader.js";
  * @returns {boolean} - True si es válido, false si no
  */
 function validateTime(time) {
-  if (!time || time === '') return true; // Opcional
-  
+  if (!time || time === "") return true; // Opcional
+
   const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
-  
+
   if (!timeRegex.test(time)) return false;
-  
-  const [hours, minutes] = time.split(':').map(Number);
+
+  const [hours, minutes] = time.split(":").map(Number);
   return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
 }
 
@@ -80,13 +80,13 @@ export default function setupDashboard() {
       createFirstTaskBtn: document.getElementById("create-first-task"),
       addNewTaskBtn: document.getElementById("new-task-button"),
       modalTitle: document.getElementById("modal-title"),
+      saveTaskButton: document.getElementById("save-task-button"),
       submitButton: document.querySelector("#task-form .submit-button"),
     };
   }
 
   // Inicializar elementos DOM
   initElements();
-
   // Inicializar estado del botón superior (oculto por defecto hasta cargar tareas)
   if (elements.addNewTaskBtn) {
     elements.addNewTaskBtn.style.display = "none";
@@ -142,7 +142,10 @@ export default function setupDashboard() {
 
     // Close mobile menu with ESC key
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && elements.headerNav?.classList.contains("open")) {
+      if (
+        event.key === "Escape" &&
+        elements.headerNav?.classList.contains("open")
+      ) {
         closeMobileMenu();
       }
     });
@@ -835,9 +838,9 @@ export default function setupDashboard() {
     let formattedTime = "";
     if (task.time) {
       // Convertir formato 24h a 12h para mostrar
-      const [hours, minutes] = task.time.split(':');
+      const [hours, minutes] = task.time.split(":");
       const hour12 = parseInt(hours) % 12 || 12;
-      const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+      const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
       formattedTime = `${hour12}:${minutes} ${ampm}`;
     }
 
@@ -969,6 +972,7 @@ export default function setupDashboard() {
    */
   function openEditTaskModal(task) {
     elements.modalTitle.textContent = "Editar Tarea";
+    elements.saveTaskButton.textContent = "Guardar Cambios";
 
     // Rellenar el formulario con los datos de la tarea
     document.getElementById("task-title").value = task.title;
