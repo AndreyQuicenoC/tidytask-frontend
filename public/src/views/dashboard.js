@@ -171,6 +171,21 @@ export default function setupDashboard() {
 
     // Initialize responsive layout on load
     handleResponsiveLayout();
+
+    // Configurar drag and drop para las columnas (solo una vez)
+    if (!window.dragAndDropInitialized) {
+      // Agregar event listeners a todas las columnas
+      document.querySelectorAll(".tasks-container").forEach((container) => {
+        container.addEventListener("dragover", handleDragOver);
+        container.addEventListener("drop", handleDrop);
+        container.addEventListener("dragenter", handleDragEnter);
+        container.addEventListener("dragleave", handleDragLeave);
+      });
+      window.dragAndDropInitialized = true;
+    }
+
+    // Configurar drag and drop para las tareas existentes
+    setupTaskDragListeners();
   }
 
   // Llamar a la función de configuración de event listeners
@@ -336,6 +351,9 @@ export default function setupDashboard() {
         tasks = [];
         updateTaskCounter();
       }
+
+      // Configurar drag and drop después de cargar las tareas
+      setupTaskDragListeners();
     } catch (error) {
       console.error("Error loading tasks:", error);
 
@@ -542,6 +560,9 @@ export default function setupDashboard() {
       });
       window.hasResizeListener = true;
     }
+
+    // Configurar event listeners para botones de eliminar todas las tareas
+    setupDeleteAllButtonsListeners();
   }
 
   /**
@@ -590,6 +611,38 @@ export default function setupDashboard() {
       }
     }
   }
+
+  /**
+   * Configura los event listeners para los botones de eliminar todas las tareas
+   */
+  function setupDeleteAllButtonsListeners() {
+    const deleteAllButtons = document.querySelectorAll(".btn-delete-all");
+    deleteAllButtons.forEach((button) => {
+      // Remover listeners anteriores para evitar duplicados
+      button.removeEventListener("click", handleDeleteAllClick);
+      // Agregar nuevo listener
+      button.addEventListener("click", handleDeleteAllClick);
+    });
+  }
+
+  /**
+   * Manejador de evento para el click en botón de eliminar todas las tareas
+   */
+  function handleDeleteAllClick(e) {
+    const button = e.target.closest(".btn-delete-all");
+    if (button) {
+      const column = button.dataset.column;
+
+      // Deshabilitar el botón temporalmente para evitar múltiples clicks
+      button.disabled = true;
+
+      handleDeleteAllTasks(column).finally(() => {
+        // Rehabilitar el botón después de la operación
+        button.disabled = false;
+      });
+    }
+  }
+
   /**
    * Configura el funcionamiento de las pestañas adaptativas
    */
@@ -825,6 +878,13 @@ export default function setupDashboard() {
     const taskDiv = document.createElement("div");
     taskDiv.className = "task-card";
     taskDiv.dataset.id = task._id;
+
+    // Agregar atributos para drag and drop
+    taskDiv.draggable = true;
+    taskDiv.dataset.status = task.status;
+
+    // Agregar event listeners de drag and drop
+    addDragEventListeners(taskDiv);
 
     // Formatear fecha y hora
     const dueDate = new Date(task.date);
@@ -1340,6 +1400,95 @@ export default function setupDashboard() {
   }
 
   /**
+   * Eliminar todas las tareas de una columna específica
+   */
+  async function handleDeleteAllTasks(column) {
+    // Mapear las columnas a los estados reales
+    const columnStatusMap = {
+      todo: "Por hacer",
+      doing: "Haciendo",
+      done: "Hecho",
+    };
+
+    const actualStatus = columnStatusMap[column];
+
+    // Filtrar tareas de la columna específica
+    const tasksInColumn = tasks.filter((task) => task.status === actualStatus);
+
+    if (tasksInColumn.length === 0) {
+      toast.info(
+        `No hay tareas en la columna "${getColumnDisplayName(column)}"`
+      );
+      return;
+    }
+
+    const columnName = getColumnDisplayName(column);
+    const confirmMessage = `¿Estás seguro de que deseas eliminar todas las ${tasksInColumn.length} tareas de la columna "${columnName}"?\n\nEsta acción no se puede deshacer.`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      // Mostrar spinner mientras se eliminan
+      showSpinner();
+
+      // Crear array de promesas para eliminar todas las tareas
+      const deletePromises = tasksInColumn.map((task) =>
+        del(`/tasks/${task._id}`)
+      );
+
+      // Ejecutar todas las eliminaciones en paralelo
+      await Promise.all(deletePromises);
+
+      // Ocultar spinner
+      hideSpinner();
+
+      // Mostrar mensaje de éxito con toast
+      toast.success(
+        `${tasksInColumn.length} tareas eliminadas correctamente de "${columnName}"`
+      );
+
+      // Actualizar el estado local
+      tasks = tasks.filter((task) => task.status !== actualStatus);
+
+      // Actualizar la UI
+      updateTaskCounter();
+      renderTasks();
+    } catch (error) {
+      console.error("Error deleting all tasks from column:", error);
+
+      // Ocultar spinner
+      hideSpinner();
+
+      // Mostrar error con toast
+      toast.error(
+        `Error al eliminar las tareas de "${columnName}". Inténtalo de nuevo.`
+      );
+
+      // En caso de error grave, recargar todas las tareas
+      try {
+        await loadTasks();
+        renderTasks();
+      } catch (reloadError) {
+        console.error("Error recargando tareas:", reloadError);
+      }
+    }
+  }
+
+  /**
+   * Obtener el nombre de visualización de una columna
+   */
+  function getColumnDisplayName(column) {
+    const columnNames = {
+      todo: "Por hacer",
+      doing: "En proceso",
+      done: "Completado",
+    };
+    return columnNames[column] || column;
+  }
+
+  /**
    * Handle responsive layout changes
    */
   function handleResponsiveLayout() {
@@ -1397,6 +1546,216 @@ export default function setupDashboard() {
     if (elements.hamburgerButton && elements.headerNav) {
       elements.hamburgerButton.classList.remove("active");
       elements.headerNav.classList.remove("open");
+    }
+  }
+
+  /**
+   * Configurar drag and drop solo para las tareas
+   */
+  function setupTaskDragListeners() {
+    document.querySelectorAll(".task-card").forEach((taskCard) => {
+      addDragEventListeners(taskCard);
+    });
+  }
+
+  // Variables globales para drag and drop
+  let draggedElement = null;
+
+  /**
+   * Agregar event listeners de drag and drop a una tarea específica
+   */
+  function addDragEventListeners(taskCard) {
+    taskCard.addEventListener("dragstart", handleDragStart);
+    taskCard.addEventListener("dragend", handleDragEnd);
+  }
+
+  /**
+   * Manejar inicio de drag
+   */
+  function handleDragStart(e) {
+    draggedElement = e.target;
+    e.target.style.opacity = "0.5";
+    e.target.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", e.target.outerHTML);
+  }
+
+  /**
+   * Manejar fin de drag
+   */
+  function handleDragEnd(e) {
+    // Restablecer el estado visual del elemento
+    if (e.target) {
+      e.target.style.opacity = "1";
+      e.target.classList.remove("dragging");
+    }
+
+    // Limpiar la referencia global
+    draggedElement = null;
+
+    // Limpiar estados visuales de las columnas
+    document.querySelectorAll(".tasks-container").forEach((container) => {
+      container.classList.remove("drag-over");
+    });
+  }
+
+  /**
+   * Manejar drag over
+   */
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
+
+  /**
+   * Manejar drag enter
+   */
+  function handleDragEnter(e) {
+    e.preventDefault();
+    if (e.target.classList.contains("tasks-container")) {
+      e.target.classList.add("drag-over");
+    }
+  }
+
+  /**
+   * Manejar drag leave
+   */
+  function handleDragLeave(e) {
+    if (e.target.classList.contains("tasks-container")) {
+      // Solo remover si realmente salimos del contenedor
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
+
+      if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+        e.target.classList.remove("drag-over");
+      }
+    }
+  }
+
+  /**
+   * Manejar drop
+   */
+  async function handleDrop(e) {
+    e.preventDefault();
+
+    // Verificar que tenemos un elemento siendo arrastrado
+    if (!draggedElement) {
+      console.error("No hay elemento siendo arrastrado");
+      return;
+    }
+
+    // Buscar el contenedor de tareas más cercano
+    let targetContainer = e.target;
+    if (!targetContainer.classList.contains("tasks-container")) {
+      targetContainer = targetContainer.closest(".tasks-container");
+    }
+
+    if (!targetContainer) {
+      console.error("No se encontró un contenedor de tareas válido");
+      // Limpiar estado
+      if (draggedElement) {
+        draggedElement.style.opacity = "1";
+        draggedElement.classList.remove("dragging");
+      }
+      return;
+    }
+
+    // Verificar que el elemento arrastrado aún existe y tiene los datos necesarios
+    if (!draggedElement.dataset || !draggedElement.dataset.id) {
+      console.error("Elemento arrastrado no tiene datos válidos");
+      targetContainer.classList.remove("drag-over");
+      return;
+    }
+
+    const taskId = draggedElement.dataset.id;
+    const currentStatus = draggedElement.dataset.status;
+
+    // Determinar el nuevo estado basado en la columna destino
+    let newStatus;
+    const columnElement = targetContainer.closest(".kanban-column");
+    const titleElement = columnElement?.querySelector("h2");
+
+    if (!columnElement || !titleElement) {
+      console.error("No se pudo encontrar la columna o el título");
+      targetContainer.classList.remove("drag-over");
+      return;
+    }
+
+    const columnTitle = titleElement.textContent;
+
+    if (columnTitle === "Por hacer") {
+      newStatus = "Por hacer";
+    } else if (columnTitle === "En proceso") {
+      newStatus = "Haciendo";
+    } else if (columnTitle === "Completado") {
+      newStatus = "Hecho";
+    } else {
+      console.error("Título de columna no reconocido:", columnTitle);
+      targetContainer.classList.remove("drag-over");
+      return;
+    }
+
+    // Si el estado no cambia, solo mover visualmente
+    if (currentStatus === newStatus) {
+      // Verificar que el elemento no esté ya en el contenedor destino
+      if (draggedElement.parentNode !== targetContainer) {
+        draggedElement.remove();
+        targetContainer.appendChild(draggedElement);
+      }
+      targetContainer.classList.remove("drag-over");
+      // Restablecer el estilo del elemento
+      draggedElement.style.opacity = "1";
+      draggedElement.classList.remove("dragging");
+      return;
+    }
+
+    // Guardar referencia del contenedor original para rollback si es necesario
+    const originalContainer = draggedElement.parentNode;
+
+    try {
+      // Actualizar el estado en el backend ANTES de mover visualmente
+      const response = await put(`/tasks/${taskId}`, {
+        status: newStatus,
+      });
+
+      if (response) {
+        // Solo proceder si la actualización fue exitosa
+        // Actualizar el estado en el array de tareas local
+        const taskIndex = tasks.findIndex((task) => task._id === taskId);
+        if (taskIndex !== -1) {
+          tasks[taskIndex].status = newStatus;
+        }
+
+        // Re-renderizar todas las tareas para mostrar los cambios inmediatamente
+        renderTasks();
+
+        // Limpiar estado visual
+        targetContainer.classList.remove("drag-over");
+
+        // Limpiar la referencia del elemento arrastrado
+        draggedElement = null;
+
+        // Mostrar mensaje de feedback
+        toast.success(`Tarea movida a "${columnTitle}"`);
+      } else {
+        throw new Error("Error al actualizar el estado de la tarea");
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      toast.error("No se pudo actualizar el estado de la tarea");
+
+      // Restablecer el estado visual del elemento arrastrado
+      if (draggedElement) {
+        draggedElement.style.opacity = "1";
+        draggedElement.classList.remove("dragging");
+      }
+
+      // Limpiar estado visual sin mover la tarea
+      targetContainer.classList.remove("drag-over");
+
+      // Limpiar la referencia del elemento arrastrado
+      draggedElement = null;
     }
   }
 }
