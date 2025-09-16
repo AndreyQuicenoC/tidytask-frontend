@@ -119,6 +119,47 @@
   font-size: 0.9rem; /* Reducido de 1.125rem a 0.9rem (-20%) */
 }
 
+/* Estilos para inputs editables en el perfil */
+.info-input {
+  font-size: 1.125rem;
+  color: #2d3748;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.info-input:focus {
+  outline: none;
+  border-color: #8463f9;
+  box-shadow: 0 0 0 3px rgba(132, 99, 249, 0.1);
+  background: #fefefe;
+}
+
+.info-input:hover {
+  border-color: #cbd5e1;
+}
+
+.info-input.readonly {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.info-input.readonly:focus {
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.info-input::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
 /* Acciones del perfil */
 .profile-actions {
   display: flex;
@@ -127,6 +168,51 @@
   margin-top: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
   padding-top: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
   border-top: 1px solid #e2e8f0;
+}
+
+/* Sección de contraseña */
+.password-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Transiciones suaves para el formulario de contraseña */
+.password-link-card {
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.password-link-card.hiding {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.profile-edit-card {
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  max-height: 0;
+  overflow: hidden;
+}
+
+.profile-edit-card.showing {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 600px;
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .password-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .profile-edit-card.showing {
+    max-height: 700px;
+  }
 }
 
 .profile-actions .btn-primary,
@@ -664,6 +750,36 @@
 /* Icon styles */
 .icon-camera::before {
   content: "📷";
+  margin-right: 0.25rem;
+}
+
+.icon-save::before {
+  content: "💾";
+  margin-right: 0.25rem;
+}
+
+.icon-edit::before {
+  content: "✏️";
+  margin-right: 0.25rem;
+}
+
+.icon-delete::before {
+  content: "🗑️";
+  margin-right: 0.25rem;
+}
+
+.icon-key::before {
+  content: "🔑";
+  margin-right: 0.25rem;
+}
+
+.icon-arrow-down::before {
+  content: "▼";
+  margin-right: 0.25rem;
+}
+
+.icon-close::before {
+  content: "✕";
   margin-right: 0.25rem;
 }
 

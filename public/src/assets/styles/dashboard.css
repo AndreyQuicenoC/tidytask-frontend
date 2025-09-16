@@ -611,27 +611,49 @@
 }
 
 /* New Task Button */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .new-task-button-container {
   display: flex;
   justify-content: flex-end;
 }
 
-.new-task-button {
+.new-task-button,
+.view-toggle-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #8463f9;
-  color: white;
   border: none;
   border-radius: var(--border-radius-medium);
   padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.new-task-button {
+  background: #8463f9;
+  color: white;
 }
 
 .new-task-button:hover {
   background: #7257da;
+}
+
+.view-toggle-button {
+  background: transparent;
+  color: #8463f9;
+  border: 2px solid #8463f9;
+}
+
+.view-toggle-button:hover {
+  background: #8463f9;
+  color: white;
 }
 
 /* Task Modal */
@@ -939,11 +961,19 @@
     margin-bottom: var(--spacing-lg);
   }
 
-  #new-task-button-container {
+  .header-buttons {
     width: 100%;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .new-task-button {
+  .new-task-button,
+  .view-toggle-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #new-task-button-container {
     width: 100%;
   }
 
