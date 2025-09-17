@@ -57,7 +57,7 @@ export default function setupDashboard() {
   let currentTask = null;
   let errorLiveRegion;
   let taskCalendar = null;
-  let currentView = 'kanban'; // 'kanban' o 'calendar'
+  let currentView = "kanban"; // 'kanban' o 'calendar'
   let isSubmittingTask = false; // Flag para prevenir múltiples envíos
 
   // Referencias a elementos del DOM
@@ -262,15 +262,36 @@ export default function setupDashboard() {
         try {
           console.log("Actualizando tareas automáticamente...");
           const originalTasks = [...tasks];
+          const originalTasksJson = JSON.stringify(originalTasks);
 
           await loadTasks(false);
 
-          if (JSON.stringify(originalTasks) !== JSON.stringify(tasks)) {
+          // Comparar si realmente hay cambios en las tareas
+          const newTasksJson = JSON.stringify(tasks);
+          const hasActualChanges = originalTasksJson !== newTasksJson;
+
+          if (hasActualChanges) {
             console.log(
-              "Se detectaron cambios en las tareas, actualizando vista..."
+              "Se detectaron cambios reales en las tareas, actualizando vista..."
             );
             renderTasks();
-            toast.info("Tareas actualizadas");
+
+            // Solo mostrar notificación si hay cambios reales en los datos
+            // y no es solo un re-render de rutina
+            if (
+              originalTasks.length !== tasks.length ||
+              originalTasks.some(
+                (task, index) =>
+                  !tasks[index] ||
+                  task._id !== tasks[index]._id ||
+                  task.status !== tasks[index].status ||
+                  task.title !== tasks[index].title ||
+                  task.date !== tasks[index].date ||
+                  task.time !== tasks[index].time
+              )
+            ) {
+              toast.info("Tareas actualizadas");
+            }
           }
         } catch (error) {
           console.error("Error en actualización automática:", error);
@@ -550,9 +571,9 @@ export default function setupDashboard() {
 
     // Responsividad: vista lista por defecto en pantallas <= 768px
     adjustLayoutForScreenSize();
-    
+
     // Actualizar calendario si está activo
-    if (currentView === 'calendar' && taskCalendar) {
+    if (currentView === "calendar" && taskCalendar) {
       taskCalendar.updateTasks(tasks);
     }
 
@@ -1037,13 +1058,13 @@ export default function setupDashboard() {
     clearFormErrors();
 
     currentTask = null;
-    
+
     // Configurar botón de envío
     if (elements.submitButton) {
       elements.submitButton.disabled = false;
       elements.submitButton.textContent = "Crear Tarea";
     }
-    
+
     elements.newTaskModal.style.display = "flex";
 
     // Validar para verificar si el botón debe estar habilitado
@@ -1086,13 +1107,13 @@ export default function setupDashboard() {
     clearFormErrors();
 
     currentTask = task;
-    
+
     // Configurar botón de envío
     if (elements.submitButton) {
       elements.submitButton.disabled = false;
       elements.submitButton.textContent = "Actualizar Tarea";
     }
-    
+
     elements.newTaskModal.style.display = "flex";
 
     // Validar para verificar si el botón debe estar habilitado
@@ -1107,7 +1128,7 @@ export default function setupDashboard() {
     elements.taskForm.reset();
     clearFormErrors();
     currentTask = null;
-    
+
     // Resetear el flag de envío y el estado del botón
     isSubmittingTask = false;
     if (elements.submitButton) {
@@ -1303,7 +1324,9 @@ export default function setupDashboard() {
     // Deshabilitar el botón de envío
     if (elements.submitButton) {
       elements.submitButton.disabled = true;
-      elements.submitButton.textContent = currentTask ? "Actualizando..." : "Creando...";
+      elements.submitButton.textContent = currentTask
+        ? "Actualizando..."
+        : "Creando...";
     }
 
     const formData = {
@@ -1349,9 +1372,9 @@ export default function setupDashboard() {
 
       // Renderizar las tareas
       renderTasks();
-      
+
       // Actualizar calendario si está activo
-      if (currentView === 'calendar' && taskCalendar) {
+      if (currentView === "calendar" && taskCalendar) {
         taskCalendar.updateTasks(tasks);
       }
     } catch (error) {
@@ -1372,7 +1395,9 @@ export default function setupDashboard() {
       isSubmittingTask = false;
       if (elements.submitButton) {
         elements.submitButton.disabled = false;
-        elements.submitButton.textContent = currentTask ? "Actualizar Tarea" : "Crear Tarea";
+        elements.submitButton.textContent = currentTask
+          ? "Actualizar Tarea"
+          : "Crear Tarea";
       }
     }
   }
@@ -1444,9 +1469,9 @@ export default function setupDashboard() {
       // Actualizar la UI
       updateTaskCounter();
       renderTasks();
-      
+
       // Actualizar calendario si está activo
-      if (currentView === 'calendar' && taskCalendar) {
+      if (currentView === "calendar" && taskCalendar) {
         taskCalendar.updateTasks(tasks);
       }
     } catch (error) {
@@ -1612,7 +1637,7 @@ export default function setupDashboard() {
    * Alterna entre vista kanban y calendario
    */
   function toggleView() {
-    if (currentView === 'kanban') {
+    if (currentView === "kanban") {
       showCalendarView();
     } else {
       showKanbanView();
@@ -1623,25 +1648,25 @@ export default function setupDashboard() {
    * Muestra la vista del calendario
    */
   function showCalendarView() {
-    currentView = 'calendar';
-    
+    currentView = "calendar";
+
     // Actualizar texto del botón
     if (elements.viewToggleText) {
-      elements.viewToggleText.textContent = 'Mirar Tablero de tareas';
+      elements.viewToggleText.textContent = "Mirar Tablero de tareas";
     }
-    
+
     // Ocultar contenido kanban
-    const tasksMainContainer = document.getElementById('tasks-main-container');
+    const tasksMainContainer = document.getElementById("tasks-main-container");
     if (tasksMainContainer) {
-      tasksMainContainer.style.display = 'none';
+      tasksMainContainer.style.display = "none";
     }
-    
+
     // Buscar si ya existe un calendario en el DOM
-    let calendarContainer = document.querySelector('.task-calendar');
-    
+    let calendarContainer = document.querySelector(".task-calendar");
+
     if (calendarContainer) {
       // Si existe, solo mostrarlo y actualizar las tareas
-      calendarContainer.style.display = 'flex';
+      calendarContainer.style.display = "flex";
       if (taskCalendar) {
         taskCalendar.updateTasks(tasks);
       }
@@ -1658,9 +1683,9 @@ export default function setupDashboard() {
         // Actualizar tareas en el calendario existente
         taskCalendar.updateTasks(tasks);
       }
-      
+
       // Insertar calendario en el contenedor principal
-      const mainCard = document.querySelector('.tasks-main-card');
+      const mainCard = document.querySelector(".tasks-main-card");
       if (mainCard) {
         mainCard.appendChild(taskCalendar.getContainer());
       }
@@ -1671,23 +1696,23 @@ export default function setupDashboard() {
    * Muestra la vista kanban
    */
   function showKanbanView() {
-    currentView = 'kanban';
-    
+    currentView = "kanban";
+
     // Actualizar texto del botón
     if (elements.viewToggleText) {
-      elements.viewToggleText.textContent = 'Mirar Calendario';
+      elements.viewToggleText.textContent = "Mirar Calendario";
     }
-    
+
     // Mostrar contenido kanban
-    const tasksMainContainer = document.getElementById('tasks-main-container');
+    const tasksMainContainer = document.getElementById("tasks-main-container");
     if (tasksMainContainer) {
-      tasksMainContainer.style.display = 'block';
+      tasksMainContainer.style.display = "block";
     }
-    
+
     // Ocultar calendario
-    const calendarContainer = document.querySelector('.task-calendar');
+    const calendarContainer = document.querySelector(".task-calendar");
     if (calendarContainer) {
-      calendarContainer.style.display = 'none';
+      calendarContainer.style.display = "none";
     }
   }
 
@@ -1699,8 +1724,8 @@ export default function setupDashboard() {
       // Abrir modal de edición con la tarea
       openEditTaskModal(task);
     } catch (error) {
-      console.error('Error updating task from calendar:', error);
-      toast.error('Error al actualizar la tarea');
+      console.error("Error updating task from calendar:", error);
+      toast.error("Error al actualizar la tarea");
     }
   }
 
@@ -1710,28 +1735,28 @@ export default function setupDashboard() {
   async function handleTaskCreateFromCalendar(taskData) {
     try {
       const response = await createTask(taskData);
-      
+
       if (response && response._id) {
         // Añadir tarea al array local
         tasks.push(response);
-        
+
         // Actualizar contador
         updateTaskCounter();
-        
+
         // Actualizar calendario
         if (taskCalendar) {
           taskCalendar.updateTasks(tasks);
         }
-        
+
         // Actualizar vista kanban también (si es necesario)
-        if (currentView === 'kanban') {
+        if (currentView === "kanban") {
           renderTasks();
         }
       }
-      
+
       return response;
     } catch (error) {
-      console.error('Error creating task from calendar:', error);
+      console.error("Error creating task from calendar:", error);
       throw error;
     }
   }
@@ -1742,13 +1767,13 @@ export default function setupDashboard() {
   async function handleTaskDeleteFromCalendar(taskId) {
     try {
       await deleteTask(taskId);
-      
+
       // Actualizar calendario
       if (taskCalendar) {
         taskCalendar.updateTasks(tasks);
       }
     } catch (error) {
-      console.error('Error deleting task from calendar:', error);
+      console.error("Error deleting task from calendar:", error);
       throw error;
     }
   }

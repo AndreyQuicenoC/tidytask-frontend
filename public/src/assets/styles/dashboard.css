@@ -27,6 +27,7 @@
   min-height: 100vh; /* Asegurar altura mínima para pantallas grandes */
   overflow-x: hidden; /* Evitar scroll horizontal */
   max-width: 100vw; /* Asegurar que no exceda el ancho de la ventana */
+  padding: 40px;
 }
 
 /* Main Card Container */
@@ -543,7 +544,7 @@
   font-weight: 500;
   font-size: 1rem;
   margin-bottom: var(--spacing-xs);
-  color: var(--text-dark);
+  color: white;
 }
 
 .task-description {
@@ -937,7 +938,7 @@
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
     margin: 15px auto 5px auto;
-    height: 850px;
+    height: 900px;
   }
 
   .kanban-board {
