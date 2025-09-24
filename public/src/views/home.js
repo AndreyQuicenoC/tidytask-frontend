@@ -165,7 +165,7 @@ function setupFeatureCardsAnimation() {
 function setupHamburgerMenu() {
   const hamburgerBtn = document.getElementById("hamburger-btn");
   const headerNav = document.getElementById("header-nav");
-  
+
   if (!hamburgerBtn || !headerNav) {
     console.log("Elementos del menú hamburguesa no encontrados");
     return;
@@ -175,7 +175,7 @@ function setupHamburgerMenu() {
   hamburgerBtn.addEventListener("click", (e) => {
     e.stopPropagation(); // Prevenir que se propague al document
     const isActive = hamburgerBtn.classList.contains("active");
-    
+
     if (isActive) {
       // Cerrar menú
       hamburgerBtn.classList.remove("active");
@@ -189,7 +189,7 @@ function setupHamburgerMenu() {
 
   // Cerrar menú al hacer clic en los botones de navegación
   const navButtons = headerNav.querySelectorAll("button, .nav-link");
-  navButtons.forEach(button => {
+  navButtons.forEach((button) => {
     button.addEventListener("click", () => {
       hamburgerBtn.classList.remove("active");
       headerNav.classList.remove("open");

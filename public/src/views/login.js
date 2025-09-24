@@ -403,6 +403,6 @@ export default function setupLogin() {
 
   // Inicializar toggle de contraseña
   addPasswordToggle("password");
-  
+
   // Footer is now handled automatically by the router
 }

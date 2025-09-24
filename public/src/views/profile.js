@@ -65,7 +65,7 @@ function initProfile() {
 
   // Cargar perfil del usuario
   loadUserProfile();
-  
+
   // Footer is now handled automatically by the router
 }
 
