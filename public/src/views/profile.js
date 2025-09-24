@@ -127,6 +127,7 @@ function setupEventListeners() {
     });
     console.log("Hide password button event listener added");
   } else {
+
     console.error("Hide password button not found");
   }
 
@@ -802,6 +803,7 @@ async function handlePasswordSubmit(e) {
     if (btn) btn.disabled = false;
     if (spinner) spinner.style.display = "none";
 
+
     // Solo actualizar estado del botón si no fue exitoso
     if (!wasSuccessful) {
       updatePasswordButtonState();
@@ -868,6 +870,7 @@ function hidePasswordForm() {
       formContainer.style.display = "none";
       linkContainer.style.display = "block";
 
+
       // Quitar clase de ocultamiento del enlace
       setTimeout(() => {
         linkContainer.classList.remove("hiding");
@@ -912,6 +915,7 @@ function handleLogout() {
   isNavigating = false;
   isInitialized = false;
   isChangingPassword = false;
+
 
   // Navegar al home
   setTimeout(() => {
