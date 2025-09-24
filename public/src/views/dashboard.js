@@ -912,6 +912,9 @@ export default function setupDashboard() {
    * @returns {HTMLElement} - Elemento del DOM para la tarea
    */
   function createTaskElement(task) {
+    // Debug: Verificar datos de la tarea
+    console.log("Creating task element for:", task);
+
     const taskDiv = document.createElement("div");
     taskDiv.className = "task-card";
     taskDiv.dataset.id = task._id;
@@ -923,22 +926,34 @@ export default function setupDashboard() {
     // Agregar event listeners de drag and drop
     addDragEventListeners(taskDiv);
 
-    // Formatear fecha y hora
-    const dueDate = new Date(task.date);
-    const formattedDate = dueDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    // Formatear fecha y hora - manejo seguro
+    let formattedDate = "Sin fecha";
+    try {
+      if (task.date) {
+        const dueDate = new Date(task.date);
+        if (!isNaN(dueDate.getTime())) {
+          formattedDate = dueDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+    }
 
     // Formatear hora si existe
     let formattedTime = "";
     if (task.time) {
-      // Convertir formato 24h a 12h para mostrar
-      const [hours, minutes] = task.time.split(":");
-      const hour12 = parseInt(hours) % 12 || 12;
-      const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
-      formattedTime = `${hour12}:${minutes} ${ampm}`;
+      try {
+        const [hours, minutes] = task.time.split(":");
+        const hour12 = parseInt(hours) % 12 || 12;
+        const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
+        formattedTime = `${hour12}:${minutes} ${ampm}`;
+      } catch (error) {
+        console.error("Error formatting time:", error);
+      }
     }
 
     // Mapear estado en inglés para mostrar en la UI
@@ -948,9 +963,23 @@ export default function setupDashboard() {
       Hecho: "Completado",
     };
 
+    // Preparar título de forma segura
+    const safeTitle =
+      task.title && task.title.trim()
+        ? task.title
+            .trim()
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+        : "Sin título";
+
+    console.log("Safe title:", safeTitle);
+
     taskDiv.innerHTML = `
-      <div class="task-title">${task.title}</div>
-      <div class="task-description">${task.detail || ""}</div>
+      <div class="task-title"></div>
+      <div class="task-description">${(task.detail || "")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")}</div>
       <div class="task-meta">
         <div class="task-date">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -982,6 +1011,22 @@ export default function setupDashboard() {
         </button>
       </div>
     `;
+
+    // Establecer el título usando textContent para evitar problemas de escape HTML
+    const titleElement = taskDiv.querySelector(".task-title");
+    if (titleElement) {
+      titleElement.textContent = safeTitle;
+      console.log("Title element created with text:", titleElement.textContent);
+
+      // Añadir estilos inline para asegurar visibilidad
+      titleElement.style.display = "block";
+      titleElement.style.fontSize = "16px";
+      titleElement.style.fontWeight = "600";
+      titleElement.style.color = "#333";
+      titleElement.style.marginBottom = "8px";
+    } else {
+      console.error("No se pudo encontrar el elemento .task-title");
+    }
 
     // Agregar event listeners para botones de editar y eliminar
     taskDiv
@@ -1040,10 +1085,14 @@ export default function setupDashboard() {
     elements.taskForm.reset();
     document.getElementById("task-id").value = "";
 
-    // Establecer fecha mínima por defecto (hoy)
+    // Establecer fecha por defecto (hoy menos 1 día para compensar visualmente)
     const today = new Date();
-    const formattedDate = today.toISOString().split("T")[0];
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const formattedDate = yesterday.toISOString().split("T")[0];
     document.getElementById("task-date").value = formattedDate;
+
+    // Establecer fecha mínima (ayer para que permita seleccionar "hoy" visualmente)
     document.getElementById("task-date").min = formattedDate;
 
     // Establecer hora por defecto (opcional - dejar vacío)
@@ -1083,10 +1132,24 @@ export default function setupDashboard() {
     document.getElementById("task-title").value = task.title;
     document.getElementById("task-detail").value = task.detail || "";
 
-    // Formatear fecha para el input type="date"
-    const dueDate = new Date(task.date);
-    const formattedDate = dueDate.toISOString().split("T")[0];
-    document.getElementById("task-date").value = formattedDate;
+    // Formatear fecha para mostrar un día anterior visualmente (compensar problema de zona horaria)
+    let dateValue = task.date;
+    if (dateValue && typeof dateValue === "string") {
+      try {
+        // Si viene en formato ISO, extraer solo la parte de fecha
+        if (dateValue.includes("T")) {
+          dateValue = dateValue.split("T")[0];
+        }
+
+        // Crear objeto Date y restar 1 día para compensar visualmente
+        const date = new Date(dateValue);
+        date.setDate(date.getDate() - 1);
+        dateValue = date.toISOString().split("T")[0];
+      } catch (error) {
+        console.error("Error processing date for display:", error);
+      }
+    }
+    document.getElementById("task-date").value = dateValue || "";
 
     // Formatear hora si existe, de lo contrario dejar vacío
     if (task.time) {
@@ -1329,10 +1392,26 @@ export default function setupDashboard() {
         : "Creando...";
     }
 
+    // Preparar datos del formulario y compensar la fecha (sumar 1 día)
+    const selectedDate = document.getElementById("task-date").value;
+    let correctedDate = selectedDate;
+
+    if (selectedDate) {
+      try {
+        // Sumar 1 día a la fecha seleccionada para compensar la resta visual
+        const date = new Date(selectedDate);
+        date.setDate(date.getDate() + 1);
+        correctedDate = date.toISOString().split("T")[0];
+      } catch (error) {
+        console.error("Error correcting date:", error);
+        correctedDate = selectedDate; // Usar fecha original si hay error
+      }
+    }
+
     const formData = {
       title: document.getElementById("task-title").value.trim(),
       detail: document.getElementById("task-detail").value.trim(),
-      date: document.getElementById("task-date").value,
+      date: correctedDate,
       time: document.getElementById("task-time").value.trim() || undefined,
       status: document.getElementById("task-status").value,
     };

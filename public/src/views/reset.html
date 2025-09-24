@@ -31,15 +31,17 @@
       <form id="reset-password-form" method="POST" class="login-form">
         <div class="form-field">
           <label class="form-label" for="new-password">Nueva contraseña</label>
-          <input
-            type="password"
-            id="new-password"
-            name="new-password"
-            placeholder="Mín. 8 caracteres con mayúscula, minúscula y número"
-            required
-            minlength="8"
-            aria-describedby="password-requirements"
-          />
+          <div class="password-field-container">
+            <input
+              type="password"
+              id="new-password"
+              name="new-password"
+              placeholder="Mín. 8 caracteres con mayúscula, minúscula y número"
+              required
+              minlength="8"
+              aria-describedby="password-requirements"
+            />
+          </div>
           <div id="new-password-error" class="tooltip-error"></div>
           <div id="password-requirements" class="password-requirements">
             La contraseña debe contener al menos 8 caracteres, incluyendo
@@ -51,14 +53,16 @@
           <label class="form-label" for="confirm-password"
             >Confirmar contraseña</label
           >
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            placeholder="Confirma tu nueva contraseña"
-            required
-            minlength="8"
-          />
+          <div class="password-field-container">
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              placeholder="Confirma tu nueva contraseña"
+              required
+              minlength="8"
+            />
+          </div>
           <div id="confirm-password-error" class="tooltip-error"></div>
         </div>
 

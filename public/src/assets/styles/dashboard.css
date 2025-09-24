@@ -933,7 +933,7 @@
   }
 
   .tasks-main-card {
-    width: 95%; /* Ocupar todo el ancho disponible */
+    width: 100%; /* Ocupar todo el ancho disponible */
     max-width: none; /* Sin límite de ancho máximo */
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
@@ -1043,7 +1043,7 @@
     padding: 12px; /* Reducir padding */
     border-radius: 10px;
     margin: 10px auto 50px auto;
-    height: 850px;
+    height: 950px;
   }
 
   .user-display {

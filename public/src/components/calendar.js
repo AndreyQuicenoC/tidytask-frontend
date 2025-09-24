@@ -38,6 +38,7 @@ export default class TaskCalendar {
   createCalendarStructure() {
     this.container = document.createElement("div");
     this.container.className = "task-calendar";
+    this.container.setAttribute("data-view", this.currentView); // Add data attribute for CSS styling
     this.container.innerHTML = `
       <div class="calendar-header">
         <div class="calendar-controls">
@@ -380,6 +381,9 @@ export default class TaskCalendar {
 
   changeView(view) {
     this.currentView = view;
+
+    // Update data attribute for CSS styling
+    this.container.setAttribute("data-view", view);
 
     // Actualizar botones activos
     this.container.querySelectorAll(".view-btn").forEach((btn) => {

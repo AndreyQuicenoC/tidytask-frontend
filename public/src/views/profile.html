@@ -4,8 +4,10 @@
 <link rel="stylesheet" href="/src/assets/styles/spinners.css" />
 <link rel="stylesheet" href="/src/assets/styles/toast.css" />
 <link rel="stylesheet" href="/src/assets/styles/profile.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
 
 <style>
   body {
@@ -25,7 +27,17 @@
     <span id="user-name">Usuario</span>
   </div>
   <button id="logout-button" class="btn-primary btn-float">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
       <polyline points="16,17 21,12 16,7"></polyline>
       <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -86,57 +98,57 @@
       <form id="profile-form" class="profile-info" novalidate>
         <div class="info-group">
           <label class="info-label" for="profile-first-name">Nombres</label>
-          <input 
-            type="text" 
-            id="profile-first-name" 
+          <input
+            type="text"
+            id="profile-first-name"
             name="profile-first-name"
-            class="info-input" 
+            class="info-input"
             placeholder="Ingresa tus nombres"
             required
             minlength="2"
             maxlength="50"
-          >
+          />
         </div>
 
         <div class="info-group">
           <label class="info-label" for="profile-last-name">Apellidos</label>
-          <input 
-            type="text" 
-            id="profile-last-name" 
+          <input
+            type="text"
+            id="profile-last-name"
             name="profile-last-name"
-            class="info-input" 
+            class="info-input"
             placeholder="Ingresa tus apellidos"
             required
             minlength="2"
             maxlength="50"
-          >
+          />
         </div>
 
         <div class="info-group">
           <label class="info-label" for="profile-age">Edad</label>
-          <input 
-            type="number" 
-            id="profile-age" 
+          <input
+            type="number"
+            id="profile-age"
             name="profile-age"
-            class="info-input" 
+            class="info-input"
             placeholder="Ingresa tu edad"
             required
             min="13"
             max="120"
-          >
+          />
         </div>
 
         <div class="info-group">
           <label class="info-label" for="profile-email">Correo</label>
-          <input 
-            type="email" 
-            id="profile-email" 
+          <input
+            type="email"
+            id="profile-email"
             name="profile-email"
-            class="info-input" 
+            class="info-input"
             placeholder="Ingresa tu correo electrónico"
             required
             maxlength="100"
-          >
+          />
         </div>
 
         <div class="info-group">
@@ -146,8 +158,13 @@
       </form>
 
       <div class="profile-actions">
-        <button id="save-profile-btn" class="btn-primary" type="submit" form="profile-form">
-          <span id="save-spinner" class="spinner" style="display: none;"></span>
+        <button
+          id="save-profile-btn"
+          class="btn-primary"
+          type="submit"
+          form="profile-form"
+        >
+          <span id="save-spinner" class="spinner" style="display: none"></span>
           <i class="fa-solid fa-floppy-disk"></i>
           Guardar cambios
         </button>
@@ -172,7 +189,11 @@
         </div>
 
         <!-- Formulario de cambio de contraseña (inicialmente oculto) -->
-        <div id="password-form-container" class="profile-edit-card" style="display: none">
+        <div
+          id="password-form-container"
+          class="profile-edit-card"
+          style="display: none"
+        >
           <div class="password-form-header">
             <h2>Cambiar Contraseña</h2>
             <button id="hide-password-form" class="btn-close">
@@ -182,51 +203,85 @@
 
           <form id="change-password-form" class="edit-form">
             <div class="form-field">
-              <label for="currentPassword" class="form-label">Contraseña actual *</label>
-              <input
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                class="form-input"
-                placeholder="Ingresa tu contraseña actual"
-                required
-              />
-              <div class="field-error" id="currentPassword-error" aria-live="polite"></div>
+              <label for="currentPassword" class="form-label"
+                >Contraseña actual *</label
+              >
+              <div class="password-field-container">
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  class="form-input"
+                  placeholder="Ingresa tu contraseña actual"
+                  required
+                />
+              </div>
+              <div
+                class="field-error"
+                id="currentPassword-error"
+                aria-live="polite"
+              ></div>
             </div>
 
             <div class="form-field">
-              <label for="newPassword" class="form-label">Nueva contraseña *</label>
-              <input
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                class="form-input"
-                placeholder="Ingresa tu nueva contraseña"
-                required
-                minlength="8"
-              />
-              <div class="field-error" id="newPassword-error" aria-live="polite"></div>
+              <label for="newPassword" class="form-label"
+                >Nueva contraseña *</label
+              >
+              <div class="password-field-container">
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  class="form-input"
+                  placeholder="Ingresa tu nueva contraseña"
+                  required
+                  minlength="8"
+                />
+              </div>
+              <div
+                class="field-error"
+                id="newPassword-error"
+                aria-live="polite"
+              ></div>
               <div class="field-help">
-                Mínimo 8 caracteres, debe incluir: mayúsculas, minúsculas, números y símbolos especiales
+                Mínimo 8 caracteres, debe incluir: mayúsculas, minúsculas,
+                números y símbolos especiales
               </div>
             </div>
 
             <div class="form-field">
-              <label for="confirmPassword" class="form-label">Confirmar nueva contraseña *</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                class="form-input"
-                placeholder="Confirma tu nueva contraseña"
-                required
-              />
-              <div class="field-error" id="confirmPassword-error" aria-live="polite"></div>
+              <label for="confirmPassword" class="form-label"
+                >Confirmar nueva contraseña *</label
+              >
+              <div class="password-field-container">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  class="form-input"
+                  placeholder="Confirma tu nueva contraseña"
+                  required
+                />
+              </div>
+              <div
+                class="field-error"
+                id="confirmPassword-error"
+                aria-live="polite"
+              ></div>
             </div>
 
             <div class="form-actions">
-              <button type="submit" id="change-password-btn" class="btn-primary" disabled>
-                <span id="password-spinner" class="spinner" style="display: none"></span>
+              <button
+                type="submit"
+                id="change-password-btn"
+                class="btn-primary"
+                disabled
+              >
+                <span
+                  id="password-spinner"
+                  class="spinner"
+                  style="display: none"
+                ></span>
                 Cambiar contraseña
               </button>
             </div>
