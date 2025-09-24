@@ -1,8 +1,9 @@
 // src/views/signup.js
 import { signup } from "../services/authService.js";
 import { navigateTo } from "../router.js";
-import { initiateGoogleAuth } from "../utils/safe-google-auth.js";
+// import { initiateGoogleAuth } from "../utils/safe-google-auth.js"; // Comentado: OAuth de Google deshabilitado
 import toast from "../utils/toast.js";
+import { addPasswordToggle } from "../utils/password-toggle.js";
 
 export default function setupSignup() {
   // Limpiar cualquier intervalo de Google Auth que pueda estar ejecutándose desde login
@@ -487,7 +488,8 @@ export default function setupSignup() {
     console.error("Botón go-home no encontrado en signup");
   }
 
-  // Botón de signup con Google
+  // Botón de signup con Google - COMENTADO: OAuth de Google deshabilitado
+  /*
   const googleLoginButton = document.querySelector(".google-login");
   if (googleLoginButton) {
     googleLoginButton.addEventListener("click", () => {
@@ -533,6 +535,13 @@ export default function setupSignup() {
   } else {
     console.error("Botón google-login no encontrado en signup");
   }
+  */
+
+  // Inicializar toggles de contraseña
+  addPasswordToggle("password");
+  addPasswordToggle("confirmPassword");
+  
+  // Footer is now handled automatically by the router
 
   // No mostrar validaciones iniciales hasta que el usuario intente enviar
   // validateAll(false); // Removido para evitar validaciones iniciales

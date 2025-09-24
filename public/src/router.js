@@ -276,6 +276,13 @@ export async function navigateTo(viewName, forceReload = false) {
 
         // Actualizar vista actual después de carga exitosa
         currentView = viewName;
+        
+        // Re-initialize footer after view is loaded
+        if (window.footerManager && window.footerManager.shouldShowFooter()) {
+          setTimeout(() => {
+            window.footerManager.handleNavigation(viewName);
+          }, 50);
+        }
 
         // Asegurar scroll al top después de la carga del script
         setTimeout(() => {

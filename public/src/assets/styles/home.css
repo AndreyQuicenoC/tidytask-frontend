@@ -140,6 +140,7 @@ body {
 .features-section {
   padding: 6rem 2rem;
   background: rgba(255, 255, 255, 0.9);
+  width: 100%;
 }
 
 .features-content {
@@ -199,23 +200,32 @@ body {
   /*linear-gradient(100deg, #5970d5 0%, #00ffd0 100%)*/
   color: white;
   text-align: center;
+  width: 100%;
 }
 
 .cta-content {
   max-width: 800px;
   margin: 0 auto;
+  text-align: center; /* Ensure button is centered */
 }
 
 .cta-title {
   font-size: 2.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .cta-description {
   font-size: 1.25rem;
   margin-bottom: 2rem;
   opacity: 0.9;
+  text-align: center;
+}
+
+#cta-signup-button {
+  display: block;
+  margin: 0 auto;
 }
 
 .landing-footer {

@@ -82,6 +82,8 @@ export default function setupHome() {
 
   // Configurar menú hamburguesa
   setupHamburgerMenu();
+
+  // Footer is now handled automatically by the router
 }
 
 function updateHeaderForLoggedUser() {

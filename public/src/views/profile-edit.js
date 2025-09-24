@@ -1,6 +1,7 @@
 import { navigate } from "../router.js";
 import { get, put } from "../services/api.js";
 import { resetProfileState } from "./profile.js";
+import { addPasswordToggle } from "../utils/password-toggle.js";
 
 // Estado de la aplicación
 let originalData = null;
@@ -68,6 +69,8 @@ function initProfileEdit() {
 
   // Cargar datos del perfil
   loadProfileData();
+  
+  // Footer is now handled automatically by the router
 }
 
 /**
@@ -136,6 +139,11 @@ function setupEventListeners() {
   if (passwordForm) {
     passwordForm.addEventListener("submit", handlePasswordSubmit);
     setupPasswordValidation();
+
+    // Configurar toggles de mostrar/ocultar contraseña
+    addPasswordToggle("currentPassword");
+    addPasswordToggle("newPassword");
+    addPasswordToggle("confirmPassword");
   }
 
   // Botones para mostrar/ocultar formulario de contraseña
@@ -180,6 +188,15 @@ function setupPasswordValidation() {
     if (field) {
       field.addEventListener("input", () => {
         validatePasswordField(fieldName);
+
+        // Si se cambia la contraseña actual, revalidar la nueva para verificar que sean diferentes
+        if (fieldName === "currentPassword") {
+          const newPasswordField = document.getElementById("newPassword");
+          if (newPasswordField && newPasswordField.value) {
+            validatePasswordField("newPassword");
+          }
+        }
+
         updatePasswordButtonState();
       });
       field.addEventListener("blur", () => validatePasswordField(fieldName));
@@ -422,9 +439,13 @@ function validatePasswordField(fieldName) {
       break;
 
     case "newPassword":
+      const currentPassword = document.getElementById("currentPassword")?.value;
       if (!value) {
         isValid = false;
         errorMessage = "La nueva contraseña es requerida";
+      } else if (value === currentPassword && currentPassword) {
+        isValid = false;
+        errorMessage = "La nueva contraseña debe ser diferente a la actual";
       } else if (value.length < 8) {
         isValid = false;
         errorMessage = "Debe tener al menos 8 caracteres";

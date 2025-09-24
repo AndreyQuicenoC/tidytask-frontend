@@ -4,6 +4,7 @@ import { navigateTo, resetCurrentView } from "../router.js";
 import { getCurrentUser } from "../services/authService.js";
 import toast from "../utils/toast.js";
 import { checkAuth } from "../utils/page-loader.js";
+import { addPasswordToggle } from "../utils/password-toggle.js";
 
 export default function setupLogin() {
   // Limpiar cualquier intervalo anterior de Google Auth que pueda estar ejecutándose
@@ -280,7 +281,8 @@ export default function setupLogin() {
     console.error("Botón go-home no encontrado en login");
   }
 
-  // Botón de login con Google
+  // Botón de login con Google - COMENTADO: OAuth de Google deshabilitado
+  /*
   document.querySelector(".google-login").addEventListener("click", () => {
     // URL específica para Google Auth (usar la URL correcta según el entorno)
     const isProduction = window.location.hostname !== "localhost";
@@ -383,6 +385,7 @@ export default function setupLogin() {
       }
     }, 30000);
   });
+  */
 
   // Función para limpiar intervalos cuando el usuario navega fuera de login
   window.cleanupLoginIntervals = function () {
@@ -397,4 +400,9 @@ export default function setupLogin() {
       console.log("Intervalos del dashboard limpiados");
     }
   };
+
+  // Inicializar toggle de contraseña
+  addPasswordToggle("password");
+  
+  // Footer is now handled automatically by the router
 }

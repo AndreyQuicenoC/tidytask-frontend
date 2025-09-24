@@ -1,6 +1,7 @@
 import { navigate } from "../router.js";
 import { get, put, del } from "../services/api.js";
 import { resetProfileEditState } from "./profile-edit.js";
+import { addPasswordToggle } from "../utils/password-toggle.js";
 
 // Estado de la aplicación
 let userProfile = null;
@@ -64,6 +65,8 @@ function initProfile() {
 
   // Cargar perfil del usuario
   loadUserProfile();
+  
+  // Footer is now handled automatically by the router
 }
 
 /**
@@ -90,6 +93,11 @@ function setupEventListeners() {
   if (passwordForm) {
     passwordForm.addEventListener("submit", handlePasswordSubmit);
     setupPasswordValidation();
+
+    // Configurar toggles de mostrar/ocultar contraseña
+    addPasswordToggle("currentPassword");
+    addPasswordToggle("newPassword");
+    addPasswordToggle("confirmPassword");
   }
 
   // Botones para mostrar/ocultar formulario de contraseña
@@ -101,7 +109,7 @@ function setupEventListeners() {
   console.log("hidePasswordBtn:", hidePasswordBtn);
 
   if (showPasswordBtn) {
-    showPasswordBtn.addEventListener("click", function(e) {
+    showPasswordBtn.addEventListener("click", function (e) {
       e.preventDefault();
       console.log("Show password button clicked");
       showPasswordForm();
@@ -112,13 +120,14 @@ function setupEventListeners() {
   }
 
   if (hidePasswordBtn) {
-    hidePasswordBtn.addEventListener("click", function(e) {
+    hidePasswordBtn.addEventListener("click", function (e) {
       e.preventDefault();
       console.log("Hide password button clicked");
       hidePasswordForm();
     });
     console.log("Hide password button event listener added");
   } else {
+
     console.error("Hide password button not found");
   }
 
@@ -259,7 +268,7 @@ function showSkeleton() {
  */
 function displayProfile(profile) {
   console.log("displayProfile called with:", profile);
-  
+
   const skeleton = document.getElementById("profile-skeleton");
   const content = document.getElementById("profile-content");
   const error = document.getElementById("profile-error");
@@ -307,7 +316,10 @@ function displayProfile(profile) {
   const avatarLetter = document.getElementById("profile-avatar-letter");
   if (avatarLetter) {
     avatarLetter.textContent = profile.firstName.charAt(0).toUpperCase();
-    console.log("Set avatar letter:", profile.firstName.charAt(0).toUpperCase());
+    console.log(
+      "Set avatar letter:",
+      profile.firstName.charAt(0).toUpperCase()
+    );
   }
 }
 
@@ -349,15 +361,15 @@ function updateNavInfo(profile) {
   // Los elementos ya se actualizan en updateHeaderInfo
   // Pero agreguemos logs para debugging
   console.log("Actualizando info del nav con perfil:", profile);
-  
+
   // También actualizar localStorage para que otros componentes lo usen
   const userData = {
     firstName: profile.firstName,
     lastName: profile.lastName,
     email: profile.email,
-    age: profile.age
+    age: profile.age,
   };
-  
+
   localStorage.setItem("user", JSON.stringify(userData));
   console.log("Datos de usuario guardados en localStorage");
 }
@@ -443,10 +455,10 @@ async function handleDeleteAccount() {
  */
 async function handleSaveProfile(e) {
   e.preventDefault();
-  
+
   const saveBtn = document.getElementById("save-profile-btn");
   const spinner = document.getElementById("save-spinner");
-  
+
   if (!saveBtn || !spinner) {
     console.error("Elementos del botón guardar no encontrados");
     return;
@@ -454,8 +466,12 @@ async function handleSaveProfile(e) {
 
   // Obtener los datos del formulario
   const formData = new FormData(e.target);
-  const firstName = formData.get('profile-first-name') || document.getElementById("profile-first-name").value.trim();
-  const lastName = formData.get('profile-last-name') || document.getElementById("profile-last-name").value.trim();
+  const firstName =
+    formData.get("profile-first-name") ||
+    document.getElementById("profile-first-name").value.trim();
+  const lastName =
+    formData.get("profile-last-name") ||
+    document.getElementById("profile-last-name").value.trim();
   const age = parseInt(document.getElementById("profile-age").value);
   const email = document.getElementById("profile-email").value.trim(); // Agregar email
 
@@ -476,7 +492,7 @@ async function handleSaveProfile(e) {
       firstName: firstName,
       lastName: lastName,
       age: age,
-      email: email
+      email: email,
     };
 
     console.log("Enviando datos de perfil:", updateData);
@@ -487,11 +503,11 @@ async function handleSaveProfile(e) {
     if (response.success && response.data) {
       // Actualizar el perfil local
       userProfile = response.data;
-      
+
       // Actualizar la información en el header
       updateHeaderInfo(userProfile);
       updateNavInfo(userProfile);
-      
+
       // Actualizar el nombre completo en el perfil
       const fullNameElement = document.getElementById("profile-full-name");
       if (fullNameElement) {
@@ -521,14 +537,14 @@ function validateProfileData(firstName, lastName, age, email) {
   if (!firstName || firstName.length < 2) {
     return {
       isValid: false,
-      message: "El nombre debe tener al menos 2 caracteres"
+      message: "El nombre debe tener al menos 2 caracteres",
     };
   }
 
   if (firstName.length > 50) {
     return {
       isValid: false,
-      message: "El nombre no puede tener más de 50 caracteres"
+      message: "El nombre no puede tener más de 50 caracteres",
     };
   }
 
@@ -536,14 +552,14 @@ function validateProfileData(firstName, lastName, age, email) {
   if (!lastName || lastName.length < 2) {
     return {
       isValid: false,
-      message: "Los apellidos deben tener al menos 2 caracteres"
+      message: "Los apellidos deben tener al menos 2 caracteres",
     };
   }
 
   if (lastName.length > 50) {
     return {
       isValid: false,
-      message: "Los apellidos no pueden tener más de 50 caracteres"
+      message: "Los apellidos no pueden tener más de 50 caracteres",
     };
   }
 
@@ -551,7 +567,7 @@ function validateProfileData(firstName, lastName, age, email) {
   if (!email || email.trim() === "") {
     return {
       isValid: false,
-      message: "El correo electrónico es requerido"
+      message: "El correo electrónico es requerido",
     };
   }
 
@@ -559,14 +575,14 @@ function validateProfileData(firstName, lastName, age, email) {
   if (!emailPattern.test(email)) {
     return {
       isValid: false,
-      message: "Formato de correo electrónico inválido"
+      message: "Formato de correo electrónico inválido",
     };
   }
 
   if (email.length > 100) {
     return {
       isValid: false,
-      message: "El correo no puede tener más de 100 caracteres"
+      message: "El correo no puede tener más de 100 caracteres",
     };
   }
 
@@ -574,24 +590,24 @@ function validateProfileData(firstName, lastName, age, email) {
   if (!age || isNaN(age) || age < 13 || age > 120) {
     return {
       isValid: false,
-      message: "La edad debe ser un número entre 13 y 120 años"
+      message: "La edad debe ser un número entre 13 y 120 años",
     };
   }
 
   // Validar caracteres especiales (solo letras, espacios y algunos caracteres especiales comunes)
   const nameRegex = /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s\-'\.]+$/;
-  
+
   if (!nameRegex.test(firstName)) {
     return {
       isValid: false,
-      message: "El nombre contiene caracteres no válidos"
+      message: "El nombre contiene caracteres no válidos",
     };
   }
 
   if (!nameRegex.test(lastName)) {
     return {
       isValid: false,
-      message: "Los apellidos contienen caracteres no válidos"
+      message: "Los apellidos contienen caracteres no válidos",
     };
   }
 
@@ -609,6 +625,15 @@ function setupPasswordValidation() {
     if (field) {
       field.addEventListener("input", () => {
         validatePasswordField(fieldName);
+
+        // Si se cambia la contraseña actual, revalidar la nueva para verificar que sean diferentes
+        if (fieldName === "currentPassword") {
+          const newPasswordField = document.getElementById("newPassword");
+          if (newPasswordField && newPasswordField.value) {
+            validatePasswordField("newPassword");
+          }
+        }
+
         updatePasswordButtonState();
       });
       field.addEventListener("blur", () => validatePasswordField(fieldName));
@@ -639,9 +664,13 @@ function validatePasswordField(fieldName) {
       break;
 
     case "newPassword":
+      const currentPassword = document.getElementById("currentPassword")?.value;
       if (!value) {
         isValid = false;
         errorMessage = "La nueva contraseña es requerida";
+      } else if (value === currentPassword && currentPassword) {
+        isValid = false;
+        errorMessage = "La nueva contraseña debe ser diferente a la actual";
       } else if (value.length < 8) {
         isValid = false;
         errorMessage = "Debe tener al menos 8 caracteres";
@@ -650,7 +679,8 @@ function validatePasswordField(fieldName) {
         errorMessage = "Debe contener al menos un número";
       } else if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(value)) {
         isValid = false;
-        errorMessage = "Debe contener al menos un carácter especial (!@#$%^&*()_+=-[]{}|;':\",./<>?)";
+        errorMessage =
+          "Debe contener al menos un carácter especial (!@#$%^&*()_+=-[]{}|;':\",./<>?)";
       } else if (!/(?=.*[a-z])/.test(value)) {
         isValid = false;
         errorMessage = "Debe contener al menos una letra minúscula";
@@ -687,7 +717,9 @@ function updatePasswordButtonState() {
   if (!btn) return;
 
   const fields = ["currentPassword", "newPassword", "confirmPassword"];
-  const allValid = fields.every((fieldName) => validatePasswordField(fieldName));
+  const allValid = fields.every((fieldName) =>
+    validatePasswordField(fieldName)
+  );
 
   btn.disabled = !allValid || isChangingPassword;
 }
@@ -702,10 +734,15 @@ async function handlePasswordSubmit(e) {
 
   // Validar todos los campos
   const fields = ["currentPassword", "newPassword", "confirmPassword"];
-  const allValid = fields.every((fieldName) => validatePasswordField(fieldName));
+  const allValid = fields.every((fieldName) =>
+    validatePasswordField(fieldName)
+  );
 
   if (!allValid) {
-    window.toast?.show("Por favor, corrige los errores en el formulario", "error");
+    window.toast?.show(
+      "Por favor, corrige los errores en el formulario",
+      "error"
+    );
     return;
   }
 
@@ -757,12 +794,16 @@ async function handlePasswordSubmit(e) {
     }
   } catch (error) {
     console.error("Error changing password:", error);
-    window.toast?.show(error.message || "Error al cambiar la contraseña", "error");
+    window.toast?.show(
+      error.message || "Error al cambiar la contraseña",
+      "error"
+    );
   } finally {
     isChangingPassword = false;
     if (btn) btn.disabled = false;
     if (spinner) spinner.style.display = "none";
-    
+
+
     // Solo actualizar estado del botón si no fue exitoso
     if (!wasSuccessful) {
       updatePasswordButtonState();
@@ -783,19 +824,19 @@ function showPasswordForm() {
 
   if (linkContainer && formContainer) {
     console.log("Both containers found, showing password form");
-    
+
     // Agregar clase de ocultamiento al enlace
     linkContainer.classList.add("hiding");
-    
+
     // Después de la transición de ocultamiento, ocultar completamente y mostrar formulario
     setTimeout(() => {
       linkContainer.style.display = "none";
       formContainer.style.display = "block";
-      
+
       // Pequeño delay para que el display: block tome efecto
       setTimeout(() => {
         formContainer.classList.add("showing");
-        
+
         // Hacer scroll suave al formulario después de la animación
         setTimeout(() => {
           formContainer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -820,15 +861,16 @@ function hidePasswordForm() {
 
   if (linkContainer && formContainer) {
     console.log("Hiding password form with animation");
-    
+
     // Quitar clase de mostrado del formulario
     formContainer.classList.remove("showing");
-    
+
     // Después de la transición, ocultar formulario y mostrar enlace
     setTimeout(() => {
       formContainer.style.display = "none";
       linkContainer.style.display = "block";
-      
+
+
       // Quitar clase de ocultamiento del enlace
       setTimeout(() => {
         linkContainer.classList.remove("hiding");
@@ -861,19 +903,20 @@ function handleLogout() {
   console.log("Ejecutando logout...");
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  
+
   // Mostrar mensaje de éxito
   if (window.toast) {
     window.toast.show("Sesión cerrada exitosamente", "success");
   }
-  
+
   // Limpiar estado de la aplicación
   userProfile = null;
   isLoading = false;
   isNavigating = false;
   isInitialized = false;
   isChangingPassword = false;
-  
+
+
   // Navegar al home
   setTimeout(() => {
     navigate("home");

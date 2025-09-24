@@ -27,6 +27,7 @@
   min-height: 100vh; /* Asegurar altura mínima para pantallas grandes */
   overflow-x: hidden; /* Evitar scroll horizontal */
   max-width: 100vw; /* Asegurar que no exceda el ancho de la ventana */
+  padding: 40px;
 }
 
 /* Main Card Container */
@@ -505,6 +506,7 @@
   margin-bottom: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: left; /* Ensure task card content is left-aligned */
 }
 
 .task-card:hover {
@@ -543,13 +545,15 @@
   font-weight: 500;
   font-size: 1rem;
   margin-bottom: var(--spacing-xs);
-  color: var(--text-dark);
+  color: white;
+  text-align: left; /* Explicitly left-align task title */
 }
 
 .task-description {
   font-size: 0.85rem;
   color: var(--text-medium);
   margin-bottom: var(--spacing-sm);
+  text-align: left; /* Explicitly left-align task description */
 }
 
 .task-meta {
@@ -557,6 +561,7 @@
   align-items: center;
   font-size: 0.8rem;
   color: #888;
+  text-align: left; /* Explicitly left-align task meta */
 }
 
 .task-date {
@@ -564,6 +569,7 @@
   align-items: center;
   gap: 4px;
   margin-right: var(--spacing-md);
+  text-align: left; /* Explicitly left-align task date */
 }
 
 .task-actions {
@@ -611,27 +617,49 @@
 }
 
 /* New Task Button */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .new-task-button-container {
   display: flex;
   justify-content: flex-end;
 }
 
-.new-task-button {
+.new-task-button,
+.view-toggle-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #8463f9;
-  color: white;
   border: none;
   border-radius: var(--border-radius-medium);
   padding: 10px 20px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.new-task-button {
+  background: #8463f9;
+  color: white;
 }
 
 .new-task-button:hover {
   background: #7257da;
+}
+
+.view-toggle-button {
+  background: transparent;
+  color: #8463f9;
+  border: 2px solid #8463f9;
+}
+
+.view-toggle-button:hover {
+  background: #8463f9;
+  color: white;
 }
 
 /* Task Modal */
@@ -910,12 +938,12 @@
   }
 
   .tasks-main-card {
-    width: 95%; /* Ocupar todo el ancho disponible */
+    width: 100%; /* Ocupar todo el ancho disponible */
     max-width: none; /* Sin límite de ancho máximo */
     border-radius: 10px; /* Reducir el radio de borde */
     padding: 15px; /* Aplicar margin de 15px como recomendado */
     margin: 15px auto 5px auto;
-    height: 850px;
+    height: 900px;
   }
 
   .kanban-board {
@@ -939,11 +967,19 @@
     margin-bottom: var(--spacing-lg);
   }
 
-  #new-task-button-container {
+  .header-buttons {
     width: 100%;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .new-task-button {
+  .new-task-button,
+  .view-toggle-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #new-task-button-container {
     width: 100%;
   }
 
@@ -1012,7 +1048,7 @@
     padding: 12px; /* Reducir padding */
     border-radius: 10px;
     margin: 10px auto 50px auto;
-    height: 850px;
+    height: 950px;
   }
 
   .user-display {

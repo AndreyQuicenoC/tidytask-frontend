@@ -20,7 +20,7 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 15px; /* Margin de 15px como recomendado */
+
   overflow-x: hidden; /* Evitar scroll horizontal */
 }
 
@@ -38,7 +38,6 @@ body {
 @media (max-width: 768px) {
   body {
     display: block; /* Cambiar a block para 768px y menos como recomendado */
-    padding: 65px 15px 15px; /* Mantener el margin de 15px */
   }
 
   .login-container {

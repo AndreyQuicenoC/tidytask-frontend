@@ -2,6 +2,7 @@
 import { resetPassword } from "../services/authService.js";
 import { navigateTo } from "../router.js";
 import toast from "../utils/toast.js";
+import { addPasswordToggle } from "../utils/password-toggle.js";
 
 export default function setupReset() {
   console.log("Configurando página de restablecimiento");
@@ -317,4 +318,10 @@ export default function setupReset() {
     // Mostrar notificación toast
     toast.error(message);
   }
+
+  // Inicializar toggles de contraseña
+  addPasswordToggle("new-password");
+  addPasswordToggle("confirm-password");
+  
+  // Footer is now handled automatically by the router
 }

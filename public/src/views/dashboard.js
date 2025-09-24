@@ -4,6 +4,7 @@ import { logout, getCurrentUser } from "../services/authService.js";
 import { get, post, put, del } from "../services/api.js";
 import toast from "../utils/toast.js";
 import { checkAuth } from "../utils/page-loader.js";
+import TaskCalendar from "../components/calendar.js";
 
 /**
  * Valida el formato de tiempo según especificaciones del backend
@@ -55,6 +56,9 @@ export default function setupDashboard() {
   let tasks = [];
   let currentTask = null;
   let errorLiveRegion;
+  let taskCalendar = null;
+  let currentView = "kanban"; // 'kanban' o 'calendar'
+  let isSubmittingTask = false; // Flag para prevenir múltiples envíos
 
   // Referencias a elementos del DOM
   let elements;
@@ -82,6 +86,8 @@ export default function setupDashboard() {
       modalTitle: document.getElementById("modal-title"),
       saveTaskButton: document.getElementById("save-task-button"),
       submitButton: document.querySelector("#task-form .submit-button"),
+      viewToggleBtn: document.getElementById("view-toggle-button"),
+      viewToggleText: document.getElementById("view-toggle-text"),
     };
   }
 
@@ -164,6 +170,11 @@ export default function setupDashboard() {
 
     if (elements.addNewTaskBtn) {
       elements.addNewTaskBtn.addEventListener("click", openNewTaskModal);
+    }
+
+    // View toggle button
+    if (elements.viewToggleBtn) {
+      elements.viewToggleBtn.addEventListener("click", toggleView);
     }
 
     // Handle window resize for responsive layout
@@ -251,15 +262,36 @@ export default function setupDashboard() {
         try {
           console.log("Actualizando tareas automáticamente...");
           const originalTasks = [...tasks];
+          const originalTasksJson = JSON.stringify(originalTasks);
 
           await loadTasks(false);
 
-          if (JSON.stringify(originalTasks) !== JSON.stringify(tasks)) {
+          // Comparar si realmente hay cambios en las tareas
+          const newTasksJson = JSON.stringify(tasks);
+          const hasActualChanges = originalTasksJson !== newTasksJson;
+
+          if (hasActualChanges) {
             console.log(
-              "Se detectaron cambios en las tareas, actualizando vista..."
+              "Se detectaron cambios reales en las tareas, actualizando vista..."
             );
             renderTasks();
-            toast.info("Tareas actualizadas");
+
+            // Solo mostrar notificación si hay cambios reales en los datos
+            // y no es solo un re-render de rutina
+            if (
+              originalTasks.length !== tasks.length ||
+              originalTasks.some(
+                (task, index) =>
+                  !tasks[index] ||
+                  task._id !== tasks[index]._id ||
+                  task.status !== tasks[index].status ||
+                  task.title !== tasks[index].title ||
+                  task.date !== tasks[index].date ||
+                  task.time !== tasks[index].time
+              )
+            ) {
+              toast.info("Tareas actualizadas");
+            }
           }
         } catch (error) {
           console.error("Error en actualización automática:", error);
@@ -275,6 +307,8 @@ export default function setupDashboard() {
           clearInterval(window.dashboardIntervalId);
         }
       });
+
+      // Footer is now handled automatically by the router
     } catch (error) {
       console.error("Error initializing dashboard:", error);
 
@@ -539,6 +573,11 @@ export default function setupDashboard() {
 
     // Responsividad: vista lista por defecto en pantallas <= 768px
     adjustLayoutForScreenSize();
+
+    // Actualizar calendario si está activo
+    if (currentView === "calendar" && taskCalendar) {
+      taskCalendar.updateTasks(tasks);
+    }
 
     // Añadir event listener para window resize si no existe ya
     if (!window.hasResizeListener) {
@@ -875,6 +914,9 @@ export default function setupDashboard() {
    * @returns {HTMLElement} - Elemento del DOM para la tarea
    */
   function createTaskElement(task) {
+    // Debug: Verificar datos de la tarea
+    console.log("Creating task element for:", task);
+
     const taskDiv = document.createElement("div");
     taskDiv.className = "task-card";
     taskDiv.dataset.id = task._id;
@@ -886,22 +928,34 @@ export default function setupDashboard() {
     // Agregar event listeners de drag and drop
     addDragEventListeners(taskDiv);
 
-    // Formatear fecha y hora
-    const dueDate = new Date(task.date);
-    const formattedDate = dueDate.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    // Formatear fecha y hora - manejo seguro
+    let formattedDate = "Sin fecha";
+    try {
+      if (task.date) {
+        const dueDate = new Date(task.date);
+        if (!isNaN(dueDate.getTime())) {
+          formattedDate = dueDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+    }
 
     // Formatear hora si existe
     let formattedTime = "";
     if (task.time) {
-      // Convertir formato 24h a 12h para mostrar
-      const [hours, minutes] = task.time.split(":");
-      const hour12 = parseInt(hours) % 12 || 12;
-      const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
-      formattedTime = `${hour12}:${minutes} ${ampm}`;
+      try {
+        const [hours, minutes] = task.time.split(":");
+        const hour12 = parseInt(hours) % 12 || 12;
+        const ampm = parseInt(hours) >= 12 ? "PM" : "AM";
+        formattedTime = `${hour12}:${minutes} ${ampm}`;
+      } catch (error) {
+        console.error("Error formatting time:", error);
+      }
     }
 
     // Mapear estado en inglés para mostrar en la UI
@@ -911,9 +965,23 @@ export default function setupDashboard() {
       Hecho: "Completado",
     };
 
+    // Preparar título de forma segura
+    const safeTitle =
+      task.title && task.title.trim()
+        ? task.title
+            .trim()
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+        : "Sin título";
+
+    console.log("Safe title:", safeTitle);
+
     taskDiv.innerHTML = `
-      <div class="task-title">${task.title}</div>
-      <div class="task-description">${task.detail || ""}</div>
+      <div class="task-title"></div>
+      <div class="task-description">${(task.detail || "")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")}</div>
       <div class="task-meta">
         <div class="task-date">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -945,6 +1013,22 @@ export default function setupDashboard() {
         </button>
       </div>
     `;
+
+    // Establecer el título usando textContent para evitar problemas de escape HTML
+    const titleElement = taskDiv.querySelector(".task-title");
+    if (titleElement) {
+      titleElement.textContent = safeTitle;
+      console.log("Title element created with text:", titleElement.textContent);
+
+      // Añadir estilos inline para asegurar visibilidad
+      titleElement.style.display = "block";
+      titleElement.style.fontSize = "16px";
+      titleElement.style.fontWeight = "600";
+      titleElement.style.color = "#333";
+      titleElement.style.marginBottom = "8px";
+    } else {
+      console.error("No se pudo encontrar el elemento .task-title");
+    }
 
     // Agregar event listeners para botones de editar y eliminar
     taskDiv
@@ -1003,10 +1087,14 @@ export default function setupDashboard() {
     elements.taskForm.reset();
     document.getElementById("task-id").value = "";
 
-    // Establecer fecha mínima por defecto (hoy)
+    // Establecer fecha por defecto (hoy menos 1 día para compensar visualmente)
     const today = new Date();
-    const formattedDate = today.toISOString().split("T")[0];
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const formattedDate = yesterday.toISOString().split("T")[0];
     document.getElementById("task-date").value = formattedDate;
+
+    // Establecer fecha mínima (ayer para que permita seleccionar "hoy" visualmente)
     document.getElementById("task-date").min = formattedDate;
 
     // Establecer hora por defecto (opcional - dejar vacío)
@@ -1021,6 +1109,13 @@ export default function setupDashboard() {
     clearFormErrors();
 
     currentTask = null;
+
+    // Configurar botón de envío
+    if (elements.submitButton) {
+      elements.submitButton.disabled = false;
+      elements.submitButton.textContent = "Crear Tarea";
+    }
+
     elements.newTaskModal.style.display = "flex";
 
     // Validar para verificar si el botón debe estar habilitado
@@ -1039,10 +1134,24 @@ export default function setupDashboard() {
     document.getElementById("task-title").value = task.title;
     document.getElementById("task-detail").value = task.detail || "";
 
-    // Formatear fecha para el input type="date"
-    const dueDate = new Date(task.date);
-    const formattedDate = dueDate.toISOString().split("T")[0];
-    document.getElementById("task-date").value = formattedDate;
+    // Formatear fecha para mostrar un día anterior visualmente (compensar problema de zona horaria)
+    let dateValue = task.date;
+    if (dateValue && typeof dateValue === "string") {
+      try {
+        // Si viene en formato ISO, extraer solo la parte de fecha
+        if (dateValue.includes("T")) {
+          dateValue = dateValue.split("T")[0];
+        }
+
+        // Crear objeto Date y restar 1 día para compensar visualmente
+        const date = new Date(dateValue);
+        date.setDate(date.getDate() - 1);
+        dateValue = date.toISOString().split("T")[0];
+      } catch (error) {
+        console.error("Error processing date for display:", error);
+      }
+    }
+    document.getElementById("task-date").value = dateValue || "";
 
     // Formatear hora si existe, de lo contrario dejar vacío
     if (task.time) {
@@ -1063,6 +1172,13 @@ export default function setupDashboard() {
     clearFormErrors();
 
     currentTask = task;
+
+    // Configurar botón de envío
+    if (elements.submitButton) {
+      elements.submitButton.disabled = false;
+      elements.submitButton.textContent = "Actualizar Tarea";
+    }
+
     elements.newTaskModal.style.display = "flex";
 
     // Validar para verificar si el botón debe estar habilitado
@@ -1077,6 +1193,13 @@ export default function setupDashboard() {
     elements.taskForm.reset();
     clearFormErrors();
     currentTask = null;
+
+    // Resetear el flag de envío y el estado del botón
+    isSubmittingTask = false;
+    if (elements.submitButton) {
+      elements.submitButton.disabled = false;
+      elements.submitButton.textContent = "Crear Tarea";
+    }
   }
 
   /**
@@ -1249,15 +1372,48 @@ export default function setupDashboard() {
   async function handleTaskFormSubmit(e) {
     e.preventDefault();
 
+    // Prevenir múltiples envíos
+    if (isSubmittingTask) {
+      console.log("Ya se está procesando una tarea, ignorando envío adicional");
+      return;
+    }
+
     // Validar el formulario antes de procesar
     if (!validateForm()) {
       return;
     }
 
+    // Marcar como enviando
+    isSubmittingTask = true;
+
+    // Deshabilitar el botón de envío
+    if (elements.submitButton) {
+      elements.submitButton.disabled = true;
+      elements.submitButton.textContent = currentTask
+        ? "Actualizando..."
+        : "Creando...";
+    }
+
+    // Preparar datos del formulario y compensar la fecha (sumar 1 día)
+    const selectedDate = document.getElementById("task-date").value;
+    let correctedDate = selectedDate;
+
+    if (selectedDate) {
+      try {
+        // Sumar 1 día a la fecha seleccionada para compensar la resta visual
+        const date = new Date(selectedDate);
+        date.setDate(date.getDate() + 1);
+        correctedDate = date.toISOString().split("T")[0];
+      } catch (error) {
+        console.error("Error correcting date:", error);
+        correctedDate = selectedDate; // Usar fecha original si hay error
+      }
+    }
+
     const formData = {
       title: document.getElementById("task-title").value.trim(),
       detail: document.getElementById("task-detail").value.trim(),
-      date: document.getElementById("task-date").value,
+      date: correctedDate,
       time: document.getElementById("task-time").value.trim() || undefined,
       status: document.getElementById("task-status").value,
     };
@@ -1297,6 +1453,11 @@ export default function setupDashboard() {
 
       // Renderizar las tareas
       renderTasks();
+
+      // Actualizar calendario si está activo
+      if (currentView === "calendar" && taskCalendar) {
+        taskCalendar.updateTasks(tasks);
+      }
     } catch (error) {
       console.error("Error saving task:", error);
 
@@ -1309,6 +1470,15 @@ export default function setupDashboard() {
       // En modo desarrollo, mostrar detalles en la consola
       if (process.env.NODE_ENV === "development") {
         console.log("Detalles del error:", error);
+      }
+    } finally {
+      // Restaurar estado del botón y flag
+      isSubmittingTask = false;
+      if (elements.submitButton) {
+        elements.submitButton.disabled = false;
+        elements.submitButton.textContent = currentTask
+          ? "Actualizar Tarea"
+          : "Crear Tarea";
       }
     }
   }
@@ -1380,6 +1550,11 @@ export default function setupDashboard() {
       // Actualizar la UI
       updateTaskCounter();
       renderTasks();
+
+      // Actualizar calendario si está activo
+      if (currentView === "calendar" && taskCalendar) {
+        taskCalendar.updateTasks(tasks);
+      }
     } catch (error) {
       console.error("Error deleting task:", error);
 
@@ -1536,6 +1711,151 @@ export default function setupDashboard() {
     if (elements.hamburgerButton && elements.headerNav) {
       elements.hamburgerButton.classList.add("active");
       elements.headerNav.classList.add("open");
+    }
+  }
+
+  /**
+   * Alterna entre vista kanban y calendario
+   */
+  function toggleView() {
+    if (currentView === "kanban") {
+      showCalendarView();
+    } else {
+      showKanbanView();
+    }
+  }
+
+  /**
+   * Muestra la vista del calendario
+   */
+  function showCalendarView() {
+    currentView = "calendar";
+
+    // Actualizar texto del botón
+    if (elements.viewToggleText) {
+      elements.viewToggleText.textContent = "Mirar Tablero de tareas";
+    }
+
+    // Ocultar contenido kanban
+    const tasksMainContainer = document.getElementById("tasks-main-container");
+    if (tasksMainContainer) {
+      tasksMainContainer.style.display = "none";
+    }
+
+    // Buscar si ya existe un calendario en el DOM
+    let calendarContainer = document.querySelector(".task-calendar");
+
+    if (calendarContainer) {
+      // Si existe, solo mostrarlo y actualizar las tareas
+      calendarContainer.style.display = "flex";
+      if (taskCalendar) {
+        taskCalendar.updateTasks(tasks);
+      }
+    } else {
+      // Si no existe, crear uno nuevo
+      if (!taskCalendar) {
+        taskCalendar = new TaskCalendar(
+          tasks,
+          handleTaskUpdateFromCalendar,
+          handleTaskCreateFromCalendar,
+          handleTaskDeleteFromCalendar
+        );
+      } else {
+        // Actualizar tareas en el calendario existente
+        taskCalendar.updateTasks(tasks);
+      }
+
+      // Insertar calendario en el contenedor principal
+      const mainCard = document.querySelector(".tasks-main-card");
+      if (mainCard) {
+        mainCard.appendChild(taskCalendar.getContainer());
+      }
+    }
+  }
+
+  /**
+   * Muestra la vista kanban
+   */
+  function showKanbanView() {
+    currentView = "kanban";
+
+    // Actualizar texto del botón
+    if (elements.viewToggleText) {
+      elements.viewToggleText.textContent = "Mirar Calendario";
+    }
+
+    // Mostrar contenido kanban
+    const tasksMainContainer = document.getElementById("tasks-main-container");
+    if (tasksMainContainer) {
+      tasksMainContainer.style.display = "block";
+    }
+
+    // Ocultar calendario
+    const calendarContainer = document.querySelector(".task-calendar");
+    if (calendarContainer) {
+      calendarContainer.style.display = "none";
+    }
+  }
+
+  /**
+   * Maneja la actualización de tareas desde el calendario
+   */
+  async function handleTaskUpdateFromCalendar(task) {
+    try {
+      // Abrir modal de edición con la tarea
+      openEditTaskModal(task);
+    } catch (error) {
+      console.error("Error updating task from calendar:", error);
+      toast.error("Error al actualizar la tarea");
+    }
+  }
+
+  /**
+   * Maneja la creación de tareas desde el calendario
+   */
+  async function handleTaskCreateFromCalendar(taskData) {
+    try {
+      const response = await createTask(taskData);
+
+      if (response && response._id) {
+        // Añadir tarea al array local
+        tasks.push(response);
+
+        // Actualizar contador
+        updateTaskCounter();
+
+        // Actualizar calendario
+        if (taskCalendar) {
+          taskCalendar.updateTasks(tasks);
+        }
+
+        // Actualizar vista kanban también (si es necesario)
+        if (currentView === "kanban") {
+          renderTasks();
+        }
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error creating task from calendar:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Maneja la eliminación de tareas desde el calendario
+   */
+  async function handleTaskDeleteFromCalendar(taskId) {
+    try {
+      await deleteTask(taskId);
+
+      // Actualizar calendario
+      if (taskCalendar) {
+        taskCalendar.updateTasks(tasks);
+      }
+    } catch (error) {
+      console.error("Error deleting task from calendar:", error);
+      throw error;
     }
   }
 
