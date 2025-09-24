@@ -140,6 +140,7 @@ body {
 .features-section {
   padding: 6rem 2rem;
   background: rgba(255, 255, 255, 0.9);
+  width: 100%;
 }
 
 .features-content {
@@ -199,11 +200,16 @@ body {
   /*linear-gradient(100deg, #5970d5 0%, #00ffd0 100%)*/
   color: white;
   text-align: center;
+  width: 100%;
 }
 
 .cta-content {
   max-width: 800px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .cta-title {
@@ -303,6 +309,8 @@ body {
 .btn-now {
   background: white;
   color: #8463f9;
+  display: inline-block;
+  margin: 0 auto;
 }
 .footer-text {
   font-size: 0.875rem;
