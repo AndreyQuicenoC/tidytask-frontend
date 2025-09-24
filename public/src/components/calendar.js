@@ -421,9 +421,31 @@ export default class TaskCalendar {
   }
 
   renderTasks() {
+    // Limpiar todas las tareas existentes antes de renderizar
+    this.clearExistingTasks();
+    
+    // Renderizar tareas actualizadas
     this.tasks.forEach((task) => {
       this.renderTask(task);
     });
+  }
+
+  clearExistingTasks() {
+    // Remover todas las tareas existentes del calendario
+    const existingTasks = this.container.querySelectorAll('.calendar-task');
+    existingTasks.forEach(task => task.remove());
+  }
+
+  // Método para agregar una sola tarea sin afectar las demás
+  addSingleTask(task) {
+    // Verificar si la tarea ya existe para evitar duplicados
+    const existingTask = this.container.querySelector(`[data-task-id="${task._id}"]`);
+    if (existingTask) {
+      existingTask.remove(); // Remover la versión anterior
+    }
+    
+    // Renderizar la nueva tarea
+    this.renderTask(task);
   }
 
   renderTask(task) {
@@ -642,14 +664,18 @@ export default class TaskCalendar {
     try {
       // Crear tarea usando el callback
       if (this.onTaskCreate) {
-        await this.onTaskCreate(formData);
-        toast.success("Tarea creada exitosamente");
-        this.closeQuickTaskModal();
-
-        // Actualizar vista del calendario
-        setTimeout(() => {
-          this.render();
-        }, 100);
+        const newTask = await this.onTaskCreate(formData);
+        
+        if (newTask) {
+          // Agregar la nueva tarea inmediatamente al array local
+          this.tasks.push(newTask);
+          
+          // Renderizar solo la nueva tarea sin limpiar todo
+          this.addSingleTask(newTask);
+          
+          toast.success("Tarea creada exitosamente");
+          this.closeQuickTaskModal();
+        }
       }
     } catch (error) {
       console.error("Error creating task from calendar:", error);
@@ -660,7 +686,8 @@ export default class TaskCalendar {
   // Método para actualizar las tareas desde el exterior
   updateTasks(newTasks) {
     this.tasks = newTasks;
-    this.render();
+    // Solo renderizar tareas, no toda la estructura del calendario
+    this.renderTasks();
   }
 
   // Método para obtener el contenedor del calendario
