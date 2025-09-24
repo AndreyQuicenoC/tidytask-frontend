@@ -210,13 +210,14 @@
 
 .form-field label,
 .form-label {
-  display: block;
+  display: flex;
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text-dark);
   position: relative;
   z-index: 2;
+  justify-content: flex-start;
 }
 /* Error message styles */
 .error-message {

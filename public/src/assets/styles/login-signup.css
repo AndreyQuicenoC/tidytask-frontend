@@ -400,11 +400,11 @@ input[type="number"].error {
   .login-container {
     padding: 8px; /* Reducido de 10px a 8px (-20%) */
     margin-bottom: 30px;
+    width: 400px;
   }
 
   .auth-card {
     border-radius: 10px; /* Reducido de 12px a 10px (-17%) */
-    min-height: calc(100vh - 16px); /* Reducido de 20px a 16px */
   }
 
   .form-section {

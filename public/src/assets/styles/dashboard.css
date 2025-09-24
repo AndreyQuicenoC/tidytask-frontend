@@ -933,8 +933,8 @@
   }
 
   .dashboard-container {
-    padding-top: 30px;
     width: 100%;
+    padding: 30px 10px;
   }
 
   .tasks-main-card {
@@ -1047,8 +1047,8 @@
   .tasks-main-card {
     padding: 12px; /* Reducir padding */
     border-radius: 10px;
-    margin: 10px auto 50px auto;
-    height: 950px;
+    margin: 30px auto 50px auto;
+    height: 100%;
   }
 
   .user-display {
