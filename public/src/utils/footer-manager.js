@@ -95,10 +95,24 @@ class FooterManager {
         window.location.hash.slice(1) ||
         "home";
       const cleanRoute = currentRoute.replace(/^\/+|\/+$/g, "");
-      if (cleanRoute !== "home" && cleanRoute !== "") {
+
+      // Never add padding for home page (including root, empty route, or explicit "home")
+      const isHomePage =
+        cleanRoute === "" ||
+        cleanRoute === "home" ||
+        window.location.pathname === "/" ||
+        window.location.hash === "#home" ||
+        window.location.hash === "";
+
+      if (!isHomePage) {
         appContainer.style.padding = "2rem";
       } else {
         appContainer.style.padding = "0";
+        // Force remove any existing padding
+        appContainer.style.paddingTop = "0";
+        appContainer.style.paddingBottom = "0";
+        appContainer.style.paddingLeft = "0";
+        appContainer.style.paddingRight = "0";
       }
 
       appContainer.style.textAlign = "center";
@@ -244,9 +258,44 @@ class FooterManager {
       // Hide footer if present
       this.remove();
     } else if (shouldShow && this.isInitialized) {
-      // Update authentication state
+      // Update authentication state and refresh layout
       const token = localStorage.getItem("token");
       this.updateAuthState(!!token);
+      // Refresh padding based on current route
+      this.updatePaddingForCurrentRoute();
+    }
+  }
+
+  /**
+   * Update padding based on current route
+   */
+  updatePaddingForCurrentRoute() {
+    const appContainer = document.querySelector("#app");
+    if (appContainer && appContainer.classList.contains("footer-app")) {
+      const currentRoute =
+        window.location.pathname.slice(1) ||
+        window.location.hash.slice(1) ||
+        "home";
+      const cleanRoute = currentRoute.replace(/^\/+|\/+$/g, "");
+
+      // Never add padding for home page
+      const isHomePage =
+        cleanRoute === "" ||
+        cleanRoute === "home" ||
+        window.location.pathname === "/" ||
+        window.location.hash === "#home" ||
+        window.location.hash === "";
+
+      if (!isHomePage) {
+        appContainer.style.padding = "2rem";
+      } else {
+        appContainer.style.padding = "0";
+        // Force remove any existing padding
+        appContainer.style.paddingTop = "0";
+        appContainer.style.paddingBottom = "0";
+        appContainer.style.paddingLeft = "0";
+        appContainer.style.paddingRight = "0";
+      }
     }
   }
 }
@@ -263,6 +312,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Handle route changes
 window.addEventListener("popstate", () => {
+  setTimeout(() => {
+    const route =
+      window.location.hash.slice(1) ||
+      window.location.pathname.slice(1) ||
+      "home";
+    footerManager.handleNavigation(route);
+  }, 100);
+});
+
+// Handle hash changes (for SPA navigation)
+window.addEventListener("hashchange", () => {
   setTimeout(() => {
     const route =
       window.location.hash.slice(1) ||
