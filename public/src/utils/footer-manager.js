@@ -88,7 +88,16 @@ class FooterManager {
       appContainer.style.alignItems = "center"; // Center content horizontally
       appContainer.style.maxWidth = "1280px";
       appContainer.style.margin = "0 auto";
-      appContainer.style.padding = "2rem";
+      
+      // Only add padding for non-home pages
+      const currentRoute = window.location.pathname.slice(1) || window.location.hash.slice(1) || "home";
+      const cleanRoute = currentRoute.replace(/^\/+|\/+$/g, '');
+      if (cleanRoute !== "home" && cleanRoute !== "") {
+        appContainer.style.padding = "2rem";
+      } else {
+        appContainer.style.padding = "0";
+      }
+      
       appContainer.style.textAlign = "center";
       appContainer.classList.add("footer-app");
     }
@@ -141,6 +150,7 @@ class FooterManager {
       appContainer.style.flexDirection = "";
       appContainer.style.justifyContent = "";
       appContainer.style.alignItems = "";
+      appContainer.style.padding = ""; // Reset padding
       appContainer.classList.remove("footer-app");
     }
   }
