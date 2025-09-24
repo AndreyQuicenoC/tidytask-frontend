@@ -24,10 +24,10 @@ class FooterManager {
     try {
       // Create footer instance
       this.footerInstance = new FooterComponent();
-      
+
       // Inject footer into the page
       this.injectFooter();
-      
+
       // Update authentication state if provided
       if (options.isAuthenticated !== undefined) {
         this.updateAuthState(options.isAuthenticated);
@@ -46,7 +46,7 @@ class FooterManager {
   injectFooter() {
     const body = document.body;
     const existingFooter = document.querySelector(".site-footer");
-    
+
     // Remove existing footer if present
     if (existingFooter) {
       existingFooter.remove();
@@ -55,7 +55,7 @@ class FooterManager {
     // Add footer directly to body (after app container)
     if (body && this.footerInstance) {
       body.appendChild(this.footerInstance.getContainer());
-      
+
       // Ensure proper body structure for footer positioning
       this.setupBodyLayout();
     }
@@ -67,7 +67,7 @@ class FooterManager {
   setupBodyLayout() {
     const body = document.body;
     const appContainer = document.querySelector("#app");
-    
+
     // Ensure body has proper flex layout for sticky footer
     if (!body.classList.contains("footer-ready")) {
       // Override the original body styles to work with footer
@@ -88,16 +88,19 @@ class FooterManager {
       appContainer.style.alignItems = "center"; // Center content horizontally
       appContainer.style.maxWidth = "1280px";
       appContainer.style.margin = "0 auto";
-      
+
       // Only add padding for non-home pages
-      const currentRoute = window.location.pathname.slice(1) || window.location.hash.slice(1) || "home";
-      const cleanRoute = currentRoute.replace(/^\/+|\/+$/g, '');
+      const currentRoute =
+        window.location.pathname.slice(1) ||
+        window.location.hash.slice(1) ||
+        "home";
+      const cleanRoute = currentRoute.replace(/^\/+|\/+$/g, "");
       if (cleanRoute !== "home" && cleanRoute !== "") {
         appContainer.style.padding = "2rem";
       } else {
         appContainer.style.padding = "0";
       }
-      
+
       appContainer.style.textAlign = "center";
       appContainer.classList.add("footer-app");
     }
@@ -122,7 +125,7 @@ class FooterManager {
       this.footerInstance = null;
       this.isInitialized = false;
     }
-    
+
     // Reset body layout when footer is removed
     this.resetBodyLayout();
   }
@@ -133,7 +136,7 @@ class FooterManager {
   resetBodyLayout() {
     const body = document.body;
     const appContainer = document.querySelector("#app");
-    
+
     if (body.classList.contains("footer-ready")) {
       // Reset body styles to original values
       body.style.display = "flex";
@@ -183,7 +186,7 @@ class FooterManager {
   autoInit() {
     const token = localStorage.getItem("token");
     const isAuthenticated = !!token;
-    
+
     // Check if we should show footer on current page
     if (this.shouldShowFooter()) {
       this.init({ isAuthenticated });
@@ -201,27 +204,24 @@ class FooterManager {
     const route = hash || path.slice(1) || "home";
 
     // Clean route by removing leading/trailing slashes and normalizing
-    const cleanRoute = route.replace(/^\/+|\/+$/g, '');
+    const cleanRoute = route.replace(/^\/+|\/+$/g, "");
 
     // Pages where footer should be shown
     const footerPages = [
       "", // root
       "home",
-      "login", 
+      "login",
       "signup",
       "recovery",
       "reset",
       "dashboard",
       "profile",
       "profile/edit",
-      "profile-edit"
+      "profile-edit",
     ];
 
     // Pages where footer should NOT be shown
-    const noFooterPages = [
-      "auth-callback",
-      "google-callback"
-    ];
+    const noFooterPages = ["auth-callback", "google-callback"];
 
     if (noFooterPages.includes(cleanRoute)) {
       return false;
@@ -236,7 +236,7 @@ class FooterManager {
    */
   handleNavigation(newRoute) {
     const shouldShow = this.shouldShowFooter();
-    
+
     if (shouldShow && !this.isInitialized) {
       // Show footer if not present
       this.autoInit();
@@ -264,7 +264,10 @@ document.addEventListener("DOMContentLoaded", () => {
 // Handle route changes
 window.addEventListener("popstate", () => {
   setTimeout(() => {
-    const route = window.location.hash.slice(1) || window.location.pathname.slice(1) || "home";
+    const route =
+      window.location.hash.slice(1) ||
+      window.location.pathname.slice(1) ||
+      "home";
     footerManager.handleNavigation(route);
   }, 100);
 });

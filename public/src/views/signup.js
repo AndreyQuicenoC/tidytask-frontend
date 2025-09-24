@@ -540,7 +540,7 @@ export default function setupSignup() {
   // Inicializar toggles de contraseña
   addPasswordToggle("password");
   addPasswordToggle("confirmPassword");
-  
+
   // Footer is now handled automatically by the router
 
   // No mostrar validaciones iniciales hasta que el usuario intente enviar

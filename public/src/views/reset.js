@@ -322,6 +322,6 @@ export default function setupReset() {
   // Inicializar toggles de contraseña
   addPasswordToggle("new-password");
   addPasswordToggle("confirm-password");
-  
+
   // Footer is now handled automatically by the router
 }

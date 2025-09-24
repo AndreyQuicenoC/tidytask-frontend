@@ -141,6 +141,6 @@ export default function setupRecovery() {
     e.preventDefault();
     navigateTo("login");
   });
-  
+
   // Footer is now handled automatically by the router
 }

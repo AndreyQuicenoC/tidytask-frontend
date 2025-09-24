@@ -155,7 +155,7 @@ export default class FooterComponent {
     this.container.addEventListener("click", (e) => {
       if (e.target.classList.contains("footer-link")) {
         e.preventDefault();
-        
+
         const route = e.target.dataset.route;
         const action = e.target.dataset.action;
 
@@ -190,7 +190,7 @@ export default class FooterComponent {
     // Add click animation
     const link = event.target;
     link.classList.add("footer-link-clicked");
-    
+
     setTimeout(() => {
       navigate(route);
       link.classList.remove("footer-link-clicked");
@@ -203,28 +203,52 @@ export default class FooterComponent {
 
     switch (action) {
       case "help":
-        this.showModal("Centro de Ayuda", "Aquí encontrarás respuestas a las preguntas más frecuentes sobre TidyTasks.");
+        this.showModal(
+          "Centro de Ayuda",
+          "Aquí encontrarás respuestas a las preguntas más frecuentes sobre TidyTasks."
+        );
         break;
       case "contact":
-        this.showModal("Contacto", "¿Necesitas ayuda? Escríbenos a: support@tidytasks.com");
+        this.showModal(
+          "Contacto",
+          "¿Necesitas ayuda? Escríbenos a: support@tidytasks.com"
+        );
         break;
       case "feedback":
-        this.showModal("Feedback", "Tu opinión es importante para nosotros. Comparte tus sugerencias para mejorar TidyTasks.");
+        this.showModal(
+          "Feedback",
+          "Tu opinión es importante para nosotros. Comparte tus sugerencias para mejorar TidyTasks."
+        );
         break;
       case "report":
-        this.showModal("Reportar Problema", "Si encontraste un error o problema, por favor describe los detalles y te ayudaremos a solucionarlo.");
+        this.showModal(
+          "Reportar Problema",
+          "Si encontraste un error o problema, por favor describe los detalles y te ayudaremos a solucionarlo."
+        );
         break;
       case "privacy":
-        this.showModal("Política de Privacidad", "En TidyTasks respetamos tu privacidad y protegemos tus datos personales según las mejores prácticas de seguridad.");
+        this.showModal(
+          "Política de Privacidad",
+          "En TidyTasks respetamos tu privacidad y protegemos tus datos personales según las mejores prácticas de seguridad."
+        );
         break;
       case "terms":
-        this.showModal("Términos de Servicio", "Al usar TidyTasks, aceptas nuestros términos y condiciones de uso del servicio.");
+        this.showModal(
+          "Términos de Servicio",
+          "Al usar TidyTasks, aceptas nuestros términos y condiciones de uso del servicio."
+        );
         break;
       case "cookies":
-        this.showModal("Política de Cookies", "Utilizamos cookies para mejorar tu experiencia en TidyTasks y personalizar el contenido.");
+        this.showModal(
+          "Política de Cookies",
+          "Utilizamos cookies para mejorar tu experiencia en TidyTasks y personalizar el contenido."
+        );
         break;
       case "security":
-        this.showModal("Seguridad", "Tu seguridad es nuestra prioridad. Implementamos las mejores prácticas de seguridad para proteger tus datos.");
+        this.showModal(
+          "Seguridad",
+          "Tu seguridad es nuestra prioridad. Implementamos las mejores prácticas de seguridad para proteger tus datos."
+        );
         break;
     }
 
@@ -255,7 +279,10 @@ export default class FooterComponent {
 
       // Setup modal event listeners
       modal.addEventListener("click", (e) => {
-        if (e.target === modal || e.target.classList.contains("footer-modal-close")) {
+        if (
+          e.target === modal ||
+          e.target.classList.contains("footer-modal-close")
+        ) {
           this.closeModal();
         }
       });
@@ -264,7 +291,7 @@ export default class FooterComponent {
     // Update modal content
     modal.querySelector(".footer-modal-title").textContent = title;
     modal.querySelector(".footer-modal-text").textContent = content;
-    
+
     // Show modal with animation
     modal.style.display = "flex";
     setTimeout(() => modal.classList.add("show"), 10);
@@ -283,7 +310,7 @@ export default class FooterComponent {
   scrollToTop() {
     const scrollDuration = 800;
     const scrollStep = -window.scrollY / (scrollDuration / 15);
-    
+
     const scrollInterval = setInterval(() => {
       if (window.scrollY !== 0) {
         window.scrollBy(0, scrollStep);
@@ -295,12 +322,14 @@ export default class FooterComponent {
 
   toggleTheme() {
     const body = document.body;
-    const currentTheme = body.classList.contains("dark-theme") ? "dark" : "light";
+    const currentTheme = body.classList.contains("dark-theme")
+      ? "dark"
+      : "light";
     const newTheme = currentTheme === "dark" ? "light" : "dark";
-    
+
     body.classList.toggle("dark-theme");
     localStorage.setItem("theme", newTheme);
-    
+
     // Add transition effect
     body.style.transition = "background-color 0.3s ease, color 0.3s ease";
     setTimeout(() => {
@@ -311,16 +340,16 @@ export default class FooterComponent {
   setupScrollProgress() {
     const progressFill = this.container.querySelector("#progress-fill");
     const scrollButton = this.container.querySelector("#scroll-to-top");
-    
+
     if (!progressFill || !scrollButton) return;
 
     window.addEventListener("scroll", () => {
       const scrollTop = window.pageYOffset;
       const docHeight = document.body.scrollHeight - window.innerHeight;
       const scrollPercent = (scrollTop / docHeight) * 100;
-      
+
       progressFill.style.width = `${scrollPercent}%`;
-      
+
       // Show/hide scroll to top button
       if (scrollTop > 300) {
         scrollButton.classList.add("show");
@@ -333,11 +362,11 @@ export default class FooterComponent {
   setupIntersectionObserver() {
     const observerOptions = {
       threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px"
+      rootMargin: "0px 0px -50px 0px",
     };
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add("footer-animate-in");
         }
@@ -345,8 +374,10 @@ export default class FooterComponent {
     }, observerOptions);
 
     // Observe footer sections for animation
-    const sections = this.container.querySelectorAll(".footer-nav-section, .footer-brand");
-    sections.forEach(section => observer.observe(section));
+    const sections = this.container.querySelectorAll(
+      ".footer-nav-section, .footer-brand"
+    );
+    sections.forEach((section) => observer.observe(section));
   }
 
   addAnimations() {
@@ -358,11 +389,11 @@ export default class FooterComponent {
 
     // Add hover animations to links
     const links = this.container.querySelectorAll(".footer-link");
-    links.forEach(link => {
+    links.forEach((link) => {
       link.addEventListener("mouseenter", () => {
         link.classList.add("footer-link-hover");
       });
-      
+
       link.addEventListener("mouseleave", () => {
         link.classList.remove("footer-link-hover");
       });
@@ -390,17 +421,21 @@ export default class FooterComponent {
 
   // Method to update footer based on user authentication status
   updateAuthenticationState(isAuthenticated) {
-    const accountLinks = this.container.querySelectorAll('[data-route="login"], [data-route="signup"], [data-route="recovery"], [data-route="reset"]');
-    const appLinks = this.container.querySelectorAll('[data-route="dashboard"], [data-route="profile"], [data-route="profile/edit"]');
-    
+    const accountLinks = this.container.querySelectorAll(
+      '[data-route="login"], [data-route="signup"], [data-route="recovery"], [data-route="reset"]'
+    );
+    const appLinks = this.container.querySelectorAll(
+      '[data-route="dashboard"], [data-route="profile"], [data-route="profile/edit"]'
+    );
+
     if (isAuthenticated) {
       // Show app links, hide auth links
-      appLinks.forEach(link => link.style.display = "");
-      accountLinks.forEach(link => link.style.display = "none");
+      appLinks.forEach((link) => (link.style.display = ""));
+      accountLinks.forEach((link) => (link.style.display = "none"));
     } else {
       // Show auth links, hide app links
-      appLinks.forEach(link => link.style.display = "none");
-      accountLinks.forEach(link => link.style.display = "");
+      appLinks.forEach((link) => (link.style.display = "none"));
+      accountLinks.forEach((link) => (link.style.display = ""));
     }
   }
 }
