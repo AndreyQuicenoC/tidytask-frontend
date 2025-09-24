@@ -1,5 +1,5 @@
 import { handleRouting } from "./router.js";
-import "./utils/google-auth-handler.js"; // Importar el manejador de autenticación de Google
+// import "./utils/google-auth-handler.js"; // Comentado: manejador de autenticación de Google deshabilitado
 import toast from "./utils/toast.js"; // Importar el sistema de toast
 import footerManager from "./utils/footer-manager.js"; // Importar el gestor del footer
 

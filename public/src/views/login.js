@@ -281,7 +281,8 @@ export default function setupLogin() {
     console.error("Botón go-home no encontrado en login");
   }
 
-  // Botón de login con Google
+  // Botón de login con Google - COMENTADO: OAuth de Google deshabilitado
+  /*
   document.querySelector(".google-login").addEventListener("click", () => {
     // URL específica para Google Auth (usar la URL correcta según el entorno)
     const isProduction = window.location.hostname !== "localhost";
@@ -384,6 +385,7 @@ export default function setupLogin() {
       }
     }, 30000);
   });
+  */
 
   // Función para limpiar intervalos cuando el usuario navega fuera de login
   window.cleanupLoginIntervals = function () {

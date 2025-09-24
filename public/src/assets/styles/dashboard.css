@@ -506,6 +506,7 @@
   margin-bottom: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: left; /* Ensure task card content is left-aligned */
 }
 
 .task-card:hover {
@@ -545,12 +546,14 @@
   font-size: 1rem;
   margin-bottom: var(--spacing-xs);
   color: white;
+  text-align: left; /* Explicitly left-align task title */
 }
 
 .task-description {
   font-size: 0.85rem;
   color: var(--text-medium);
   margin-bottom: var(--spacing-sm);
+  text-align: left; /* Explicitly left-align task description */
 }
 
 .task-meta {
@@ -558,6 +561,7 @@
   align-items: center;
   font-size: 0.8rem;
   color: #888;
+  text-align: left; /* Explicitly left-align task meta */
 }
 
 .task-date {
@@ -565,6 +569,7 @@
   align-items: center;
   gap: 4px;
   margin-right: var(--spacing-md);
+  text-align: left; /* Explicitly left-align task date */
 }
 
 .task-actions {

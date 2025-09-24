@@ -70,7 +70,6 @@ export default class FooterComponent {
                 <li><a href="#" class="footer-link" data-route="home">Inicio</a></li>
                 <li><a href="#" class="footer-link" data-route="dashboard">Dashboard</a></li>
                 <li><a href="#" class="footer-link" data-route="profile">Mi Perfil</a></li>
-                <li><a href="#" class="footer-link" data-route="profile/edit">Editar Perfil</a></li>
               </ul>
             </div>
 

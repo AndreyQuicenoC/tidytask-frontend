@@ -15,6 +15,7 @@
   box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1); /* Reducido de 4px 20px */
   padding: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
   margin-bottom: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
+  text-align: left; /* Ensure profile card content is left-aligned */
 }
 
 .profile-edit-card {
@@ -23,6 +24,7 @@
   box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1); /* Reducido de 4px 20px */
   padding: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
   margin-bottom: 1.6rem; /* Reducido de 2rem a 1.6rem (-20%) */
+  text-align: left; /* Ensure profile edit card content is left-aligned */
 }
 
 /* Header del perfil */
@@ -99,6 +101,7 @@
 .profile-info {
   display: grid;
   gap: 1.2rem; /* Reducido de 1.5rem a 1.2rem (-20%) */
+  text-align: left; /* Ensure profile info content is left-aligned */
 }
 
 .info-group {
