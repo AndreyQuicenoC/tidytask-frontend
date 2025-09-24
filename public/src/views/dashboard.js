@@ -307,6 +307,8 @@ export default function setupDashboard() {
           clearInterval(window.dashboardIntervalId);
         }
       });
+
+      // Footer is now handled automatically by the router
     } catch (error) {
       console.error("Error initializing dashboard:", error);
 

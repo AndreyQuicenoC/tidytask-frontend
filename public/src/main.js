@@ -1,9 +1,13 @@
 import { handleRouting } from "./router.js";
 import "./utils/google-auth-handler.js"; // Importar el manejador de autenticación de Google
 import toast from "./utils/toast.js"; // Importar el sistema de toast
+import footerManager from "./utils/footer-manager.js"; // Importar el gestor del footer
 
 // Exponer sistema de toast globalmente
 window.toast = toast;
+
+// Exponer gestor del footer globalmente para uso en vistas
+window.footerManager = footerManager;
 
 // Para depuración
 console.log("Aplicación iniciada");

@@ -69,6 +69,8 @@ function initProfileEdit() {
 
   // Cargar datos del perfil
   loadProfileData();
+  
+  // Footer is now handled automatically by the router
 }
 
 /**
