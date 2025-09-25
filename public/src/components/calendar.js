@@ -551,6 +551,10 @@ export default class TaskCalendar {
   handleTaskClick(task) {
     // Mostrar modal de confirmación para editar la tarea
     this.showEditTaskModal(task);
+    // Si el callback de editar no está definido, mostrar advertencia
+    if (!this.onTaskUpdate) {
+      toast.warning("Función de edición no disponible");
+    }
   }
 
   showEditTaskModal(task) {
@@ -599,8 +603,10 @@ export default class TaskCalendar {
     editModal.querySelector("#edit-task-title").textContent = task.title;
     editModal.querySelector("#confirm-edit-task").onclick = () => {
       this.closeEditTaskModal();
-      if (this.onTaskUpdate) {
+      if (typeof this.onTaskUpdate === "function") {
         this.onTaskUpdate(task);
+      } else {
+        toast.warning("No se puede editar la tarea: función no disponible");
       }
     };
 

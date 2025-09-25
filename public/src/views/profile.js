@@ -2,6 +2,7 @@ import { navigate } from "../router.js";
 import { get, put, del } from "../services/api.js";
 import { resetProfileEditState } from "./profile-edit.js";
 import { addPasswordToggle } from "../utils/password-toggle.js";
+import toast from "../utils/toast.js";
 
 // Estado de la aplicación
 let userProfile = null;
@@ -127,7 +128,6 @@ function setupEventListeners() {
     });
     console.log("Hide password button event listener added");
   } else {
-
     console.error("Hide password button not found");
   }
 
@@ -321,6 +321,16 @@ function displayProfile(profile) {
       profile.firstName.charAt(0).toUpperCase()
     );
   }
+
+  // Actualizar el nombre completo en el perfil
+  const fullNameElement = document.getElementById("profile-full-name");
+  if (fullNameElement) {
+    const fullName = `${profile.firstName} ${profile.lastName}`;
+    fullNameElement.textContent = fullName;
+    console.log("Set profile full name:", fullName);
+  } else {
+    console.error("Elemento profile-full-name no encontrado");
+  }
 }
 
 /**
@@ -413,7 +423,7 @@ function hideDeleteModal() {
 }
 
 /**
- * Manejar eliminación de cuenta
+ * Manejar eliminación de cuenta con opción de deshacer por 5 segundos
  */
 async function handleDeleteAccount() {
   const confirmBtn = document.getElementById("confirm-delete");
@@ -421,32 +431,61 @@ async function handleDeleteAccount() {
 
   if (!confirmBtn || !spinner) return;
 
-  // Mostrar spinner
-  spinner.style.display = "inline-block";
-  confirmBtn.disabled = true;
+  // Ocultar modal inmediatamente
+  hideDeleteModal();
 
   try {
+    // Verificar que hay token antes de proceder
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("Token no encontrado");
     }
 
-    // Usar el servicio API en lugar de fetch directo
-    await del("/users/me", true);
+    // Variables para controlar el estado de cancelación
+    let isCancelled = false;
+    let deletionTimeout = null;
 
-    // Cuenta eliminada exitosamente
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.toast?.show("Tu cuenta ha sido eliminada exitosamente", "success");
-    navigate("home");
+    // Función para cancelar la eliminación
+    function cancelDeletion() {
+      if (!isCancelled) {
+        isCancelled = true;
+        if (deletionTimeout) {
+          clearTimeout(deletionTimeout);
+          deletionTimeout = null;
+        }
+        toast.info("Eliminación de cuenta cancelada");
+      }
+    }
+
+    // Mostrar toast de deshacer con 5 segundos para cancelar
+    toast.undo(
+      "Cuenta será eliminada en 5 segundos",
+      cancelDeletion,
+      5000 // 5 segundos para deshacer
+    );
+
+    // Programar eliminación definitiva después de 5 segundos
+    deletionTimeout = setTimeout(async () => {
+      if (!isCancelled) {
+        try {
+          if (spinner) spinner.style.display = "inline-block";
+          if (confirmBtn) confirmBtn.disabled = true;
+          await del("/users/me", true);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          toast.success("Tu cuenta ha sido eliminada definitivamente");
+          setTimeout(() => {
+            navigate("home");
+          }, 1000);
+        } catch (error) {
+          if (spinner) spinner.style.display = "none";
+          if (confirmBtn) confirmBtn.disabled = false;
+          toast.error("Error al eliminar la cuenta del servidor");
+        }
+      }
+    }, 5000);
   } catch (error) {
-    console.error("Error deleting account:", error);
-    window.toast?.show("Error al eliminar la cuenta", "error");
-  } finally {
-    // Ocultar spinner
-    spinner.style.display = "none";
-    confirmBtn.disabled = false;
-    hideDeleteModal();
+    toast.error("Error al procesar eliminación de cuenta");
   }
 }
 
@@ -478,7 +517,7 @@ async function handleSaveProfile(e) {
   // Validar los datos (incluir email en la validación)
   const validation = validateProfileData(firstName, lastName, age, email);
   if (!validation.isValid) {
-    window.toast?.show(validation.message, "error");
+    toast.error(validation.message);
     return;
   }
 
@@ -511,17 +550,19 @@ async function handleSaveProfile(e) {
       // Actualizar el nombre completo en el perfil
       const fullNameElement = document.getElementById("profile-full-name");
       if (fullNameElement) {
-        fullNameElement.textContent = `${userProfile.firstName} ${userProfile.lastName}`;
+        const fullName = `${userProfile.firstName} ${userProfile.lastName}`;
+        fullNameElement.textContent = fullName;
+        console.log("Updated profile full name after save:", fullName);
       }
 
       // Mostrar mensaje de éxito
-      window.toast?.show("Perfil actualizado exitosamente", "success");
+      toast.success("Perfil actualizado exitosamente");
     } else {
       throw new Error("Respuesta inválida del servidor");
     }
   } catch (error) {
     console.error("Error saving profile:", error);
-    window.toast?.show(error.message || "Error al guardar el perfil", "error");
+    toast.error(error.message || "Error al guardar el perfil");
   } finally {
     // Ocultar spinner y habilitar botón
     spinner.style.display = "none";
@@ -739,10 +780,7 @@ async function handlePasswordSubmit(e) {
   );
 
   if (!allValid) {
-    window.toast?.show(
-      "Por favor, corrige los errores en el formulario",
-      "error"
-    );
+    toast.error("Por favor, corrige los errores en el formulario");
     return;
   }
 
@@ -788,21 +826,17 @@ async function handlePasswordSubmit(e) {
       // Ocultar formulario de contraseña después del éxito
       hidePasswordForm();
 
-      window.toast?.show("Contraseña actualizada exitosamente", "success");
+      toast.success("Contraseña actualizada exitosamente");
     } else {
       throw new Error("Respuesta inválida del servidor");
     }
   } catch (error) {
     console.error("Error changing password:", error);
-    window.toast?.show(
-      error.message || "Error al cambiar la contraseña",
-      "error"
-    );
+    toast.error(error.message || "Error al cambiar la contraseña");
   } finally {
     isChangingPassword = false;
     if (btn) btn.disabled = false;
     if (spinner) spinner.style.display = "none";
-
 
     // Solo actualizar estado del botón si no fue exitoso
     if (!wasSuccessful) {
@@ -870,7 +904,6 @@ function hidePasswordForm() {
       formContainer.style.display = "none";
       linkContainer.style.display = "block";
 
-
       // Quitar clase de ocultamiento del enlace
       setTimeout(() => {
         linkContainer.classList.remove("hiding");
@@ -905,9 +938,7 @@ function handleLogout() {
   localStorage.removeItem("user");
 
   // Mostrar mensaje de éxito
-  if (window.toast) {
-    window.toast.show("Sesión cerrada exitosamente", "success");
-  }
+  toast.success("Sesión cerrada exitosamente");
 
   // Limpiar estado de la aplicación
   userProfile = null;
@@ -915,7 +946,6 @@ function handleLogout() {
   isNavigating = false;
   isInitialized = false;
   isChangingPassword = false;
-
 
   // Navegar al home
   setTimeout(() => {

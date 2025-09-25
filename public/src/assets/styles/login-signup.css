@@ -483,3 +483,67 @@ input[type="number"].error {
     gap: 8px; /* Reducido de 10px a 8px (-20%) */
   }
 }
+
+/* Estilos para redes sociales en páginas de autenticación */
+.auth-social {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.auth-social .social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(132, 99, 249, 0.1);
+  border-radius: 12px;
+  color: #8463f9;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(132, 99, 249, 0.2);
+}
+
+.auth-social .social-link:hover {
+  background: #8463f9;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(132, 99, 249, 0.3);
+}
+
+.auth-social .social-link svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.auth-social .social-link:hover svg {
+  transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+  .auth-social {
+    margin-top: 16px;
+  }
+
+  .social-links {
+    gap: 12px;
+  }
+
+  .auth-social .social-link {
+    width: 40px;
+    height: 40px;
+  }
+
+  .auth-social .social-link svg {
+    width: 18px;
+    height: 18px;
+  }
+}

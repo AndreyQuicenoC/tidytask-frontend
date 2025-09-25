@@ -183,20 +183,34 @@ export default function setupDashboard() {
     // Initialize responsive layout on load
     handleResponsiveLayout();
 
-    // Configurar drag and drop para las columnas (solo una vez)
-    if (!window.dragAndDropInitialized) {
-      // Agregar event listeners a todas las columnas
-      document.querySelectorAll(".tasks-container").forEach((container) => {
-        container.addEventListener("dragover", handleDragOver);
-        container.addEventListener("drop", handleDrop);
-        container.addEventListener("dragenter", handleDragEnter);
-        container.addEventListener("dragleave", handleDragLeave);
-      });
-      window.dragAndDropInitialized = true;
-    }
+    // Configurar drag and drop para las columnas (siempre reinicializar)
+    setupDragAndDropListeners();
 
     // Configurar drag and drop para las tareas existentes
     setupTaskDragListeners();
+
+    // Configurar delegación de eventos para botones de acción de tareas
+    setupTaskActionDelegation();
+  }
+
+  /**
+   * Configurar drag and drop listeners para las columnas
+   */
+  function setupDragAndDropListeners() {
+    // Limpiar listeners existentes para evitar duplicados
+    document.querySelectorAll(".tasks-container").forEach((container) => {
+      // Clonar el elemento para remover todos los event listeners
+      const newContainer = container.cloneNode(true);
+      container.parentNode.replaceChild(newContainer, container);
+    });
+
+    // Agregar event listeners frescos a todas las columnas
+    document.querySelectorAll(".tasks-container").forEach((container) => {
+      container.addEventListener("dragover", handleDragOver);
+      container.addEventListener("drop", handleDrop);
+      container.addEventListener("dragenter", handleDragEnter);
+      container.addEventListener("dragleave", handleDragLeave);
+    });
   }
 
   // Llamar a la función de configuración de event listeners
@@ -565,9 +579,22 @@ export default function setupDashboard() {
       });
     }
 
-    // Volver a configurar event listeners después de renderizar
-    setupEventListeners();
-
+    // Reconfigurar drag and drop y botones de acción después de renderizar las tareas
+    if (tasks && tasks.length > 0) {
+      setupDragAndDropListeners && setupDragAndDropListeners();
+      setupTaskDragListeners && setupTaskDragListeners();
+    }
+    // Asegura que los listeners de los botones de acción se re-inicialicen al volver al dashboard
+    window.addEventListener("popstate", () => {
+      if (
+        window.location.hash === "#/dashboard" ||
+        window.location.pathname.endsWith("dashboard.html")
+      ) {
+        setTimeout(() => {
+          if (typeof renderTasks === "function") renderTasks();
+        }, 100); // Espera breve para asegurar que el DOM esté actualizado
+      }
+    });
     // Configurar tabs móviles
     setupMobileTabs();
 
@@ -1020,23 +1047,20 @@ export default function setupDashboard() {
       titleElement.textContent = safeTitle;
       console.log("Title element created with text:", titleElement.textContent);
 
-      // Añadir estilos inline para asegurar visibilidad
+      // Añadir estilos inline para asegurar visibilidad y alineación
       titleElement.style.display = "block";
       titleElement.style.fontSize = "16px";
       titleElement.style.fontWeight = "600";
       titleElement.style.color = "#333";
       titleElement.style.marginBottom = "8px";
+      titleElement.style.textAlign = "left";
+      titleElement.style.width = "100%";
     } else {
       console.error("No se pudo encontrar el elemento .task-title");
     }
 
-    // Agregar event listeners para botones de editar y eliminar
-    taskDiv
-      .querySelector(".edit-task-btn")
-      .addEventListener("click", () => openEditTaskModal(task));
-    taskDiv
-      .querySelector(".delete-task-btn")
-      .addEventListener("click", () => deleteTask(task._id));
+    // Los event listeners se configuran a nivel del contenedor padre usando delegación
+    // para mayor robustez y evitar problemas después de re-renders
 
     return taskDiv;
   }
@@ -1523,31 +1547,33 @@ export default function setupDashboard() {
   }
 
   /**
-   * Elimina una tarea
+   * Elimina una tarea con opción de deshacer por 5 segundos
    * @param {string} taskId - ID de la tarea a eliminar
    */
   async function deleteTask(taskId) {
-    if (!confirm("¿Estás seguro de que deseas eliminar esta tarea?")) {
+    // Buscar la tarea a eliminar
+    const taskToDelete = tasks.find((task) => task._id === taskId);
+    if (!taskToDelete) {
+      toast.error("Tarea no encontrada");
       return;
     }
 
+    // Mostrar confirmación mejorada
+    const confirmed = await showDeleteConfirmation(
+      "¿Estás seguro que deseas eliminar?",
+      "Esta tarea será eliminada permanentemente y no se puede recuperar."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    let isUndone = false;
+    let timeoutId = null;
+
     try {
-      // Mostrar spinner mientras se elimina
-      showSpinner();
-
-      // Llamar al API para eliminar
-      await del(`/tasks/${taskId}`);
-
-      // Ocultar spinner
-      hideSpinner();
-
-      // Mostrar mensaje de éxito con toast
-      toast.success("Tarea eliminada correctamente");
-
-      // Actualizar el estado local sin tener que recargar del servidor
+      // Remover tarea inmediatamente de la UI
       tasks = tasks.filter((task) => task._id !== taskId);
-
-      // Actualizar la UI
       updateTaskCounter();
       renderTasks();
 
@@ -1555,27 +1581,85 @@ export default function setupDashboard() {
       if (currentView === "calendar" && taskCalendar) {
         taskCalendar.updateTasks(tasks);
       }
+
+      // Mostrar toast de deshacer con 5 segundos para cancelar
+      const undoToast = toast.undo(
+        `Tarea "${taskToDelete.title}" eliminada`,
+        () => {
+          // Función de deshacer
+          isUndone = true;
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+
+          // Restaurar tarea en la UI
+          tasks.push(taskToDelete);
+          tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+          updateTaskCounter();
+          renderTasks();
+
+          // Actualizar calendario si está activo
+          if (currentView === "calendar" && taskCalendar) {
+            taskCalendar.updateTasks(tasks);
+          }
+
+          toast.info("Eliminación cancelada");
+        },
+        5000 // 5 segundos para deshacer
+      );
+
+      // Programar eliminación definitiva después de 5 segundos
+      timeoutId = setTimeout(async () => {
+        if (!isUndone) {
+          try {
+            // Mostrar spinner mientras se elimina definitivamente
+            showSpinner();
+
+            // Llamar al API para eliminar definitivamente
+            await del(`/tasks/${taskId}`);
+
+            // Ocultar spinner
+            hideSpinner();
+
+            toast.success("Tarea eliminada definitivamente");
+          } catch (error) {
+            console.error("Error deleting task permanently:", error);
+
+            // Ocultar spinner
+            hideSpinner();
+
+            // Si falló la eliminación del servidor, restaurar la tarea
+            tasks.push(taskToDelete);
+            tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+            updateTaskCounter();
+            renderTasks();
+
+            // Actualizar calendario si está activo
+            if (currentView === "calendar" && taskCalendar) {
+              taskCalendar.updateTasks(tasks);
+            }
+
+            toast.error(
+              "Error al eliminar la tarea del servidor. Tarea restaurada."
+            );
+          }
+        }
+      }, 5000);
     } catch (error) {
-      console.error("Error deleting task:", error);
+      console.error("Error in delete task process:", error);
 
-      // Ocultar spinner
-      hideSpinner();
+      // Restaurar tarea en caso de error
+      tasks.push(taskToDelete);
+      tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+      updateTaskCounter();
+      renderTasks();
 
-      // Mostrar error con toast
-      toast.error("Error al eliminar la tarea. Inténtalo de nuevo.");
-
-      // En caso de error grave, recargar todas las tareas
-      try {
-        await loadTasks();
-        renderTasks();
-      } catch (reloadError) {
-        console.error("Error recargando tareas:", reloadError);
-      }
+      toast.error("Error al procesar eliminación. Tarea restaurada.");
     }
   }
 
   /**
-   * Eliminar todas las tareas de una columna específica
+   * Eliminar todas las tareas de una columna específica con opción de deshacer
    */
   async function handleDeleteAllTasks(column) {
     // Mapear las columnas a los estados reales
@@ -1598,56 +1682,111 @@ export default function setupDashboard() {
     }
 
     const columnName = getColumnDisplayName(column);
-    const confirmMessage = `¿Estás seguro de que deseas eliminar todas las ${tasksInColumn.length} tareas de la columna "${columnName}"?\n\nEsta acción no se puede deshacer.`;
 
-    if (!confirm(confirmMessage)) {
+    // Mostrar confirmación mejorada
+    const confirmed = await showDeleteConfirmation(
+      "¿Estás seguro que deseas eliminar?",
+      `Se eliminarán todas las ${tasksInColumn.length} tareas de la columna "${columnName}". Tendrás 5 segundos para deshacer la acción.`
+    );
+
+    if (!confirmed) {
       return;
     }
 
+    let isUndone = false;
+    let timeoutId = null;
+
     try {
-      // Mostrar spinner mientras se eliminan
-      showSpinner();
-
-      // Crear array de promesas para eliminar todas las tareas
-      const deletePromises = tasksInColumn.map((task) =>
-        del(`/tasks/${task._id}`)
-      );
-
-      // Ejecutar todas las eliminaciones en paralelo
-      await Promise.all(deletePromises);
-
-      // Ocultar spinner
-      hideSpinner();
-
-      // Mostrar mensaje de éxito con toast
-      toast.success(
-        `${tasksInColumn.length} tareas eliminadas correctamente de "${columnName}"`
-      );
-
-      // Actualizar el estado local
+      // Remover tareas inmediatamente de la UI
       tasks = tasks.filter((task) => task.status !== actualStatus);
-
-      // Actualizar la UI
       updateTaskCounter();
       renderTasks();
-    } catch (error) {
-      console.error("Error deleting all tasks from column:", error);
 
-      // Ocultar spinner
-      hideSpinner();
+      // Actualizar calendario si está activo
+      if (currentView === "calendar" && taskCalendar) {
+        taskCalendar.updateTasks(tasks);
+      }
 
-      // Mostrar error con toast
-      toast.error(
-        `Error al eliminar las tareas de "${columnName}". Inténtalo de nuevo.`
+      // Mostrar toast de deshacer con 5 segundos para cancelar
+      const undoToast = toast.undo(
+        `${tasksInColumn.length} tareas eliminadas de "${columnName}"`,
+        () => {
+          // Función de deshacer
+          isUndone = true;
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+
+          // Restaurar todas las tareas en la UI
+          tasks.push(...tasksInColumn);
+          tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+          updateTaskCounter();
+          renderTasks();
+
+          // Actualizar calendario si está activo
+          if (currentView === "calendar" && taskCalendar) {
+            taskCalendar.updateTasks(tasks);
+          }
+
+          toast.info("Eliminación masiva cancelada");
+        },
+        5000 // 5 segundos para deshacer
       );
 
-      // En caso de error grave, recargar todas las tareas
-      try {
-        await loadTasks();
-        renderTasks();
-      } catch (reloadError) {
-        console.error("Error recargando tareas:", reloadError);
-      }
+      // Programar eliminación definitiva después de 5 segundos
+      timeoutId = setTimeout(async () => {
+        if (!isUndone) {
+          try {
+            // Mostrar spinner mientras se eliminan definitivamente
+            showSpinner();
+
+            // Crear array de promesas para eliminar todas las tareas del servidor
+            const deletePromises = tasksInColumn.map((task) =>
+              del(`/tasks/${task._id}`)
+            );
+
+            // Ejecutar todas las eliminaciones en paralelo
+            await Promise.all(deletePromises);
+
+            // Ocultar spinner
+            hideSpinner();
+
+            toast.success(
+              `${tasksInColumn.length} tareas eliminadas definitivamente de "${columnName}"`
+            );
+          } catch (error) {
+            console.error("Error deleting all tasks permanently:", error);
+
+            // Ocultar spinner
+            hideSpinner();
+
+            // Si falló la eliminación del servidor, restaurar las tareas
+            tasks.push(...tasksInColumn);
+            tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+            updateTaskCounter();
+            renderTasks();
+
+            // Actualizar calendario si está activo
+            if (currentView === "calendar" && taskCalendar) {
+              taskCalendar.updateTasks(tasks);
+            }
+
+            toast.error(
+              `Error al eliminar las tareas del servidor. Tareas de "${columnName}" restauradas.`
+            );
+          }
+        }
+      }, 5000);
+    } catch (error) {
+      console.error("Error in delete all tasks process:", error);
+
+      // Restaurar tareas en caso de error
+      tasks.push(...tasksInColumn);
+      tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+      updateTaskCounter();
+      renderTasks();
+
+      toast.error("Error al procesar eliminación masiva. Tareas restauradas.");
     }
   }
 
@@ -1878,6 +2017,62 @@ export default function setupDashboard() {
     });
   }
 
+  /**
+   * Configura la delegación de eventos para botones de acción de tareas
+   * Usando event delegation para mayor robustez y evitar problemas después de re-renders
+   */
+  function setupTaskActionDelegation() {
+    console.log("Setting up task action delegation...");
+
+    // Remover listener anterior si existe para evitar duplicados
+    if (elements.kanbanBoard) {
+      elements.kanbanBoard.removeEventListener("click", handleTaskActionClick);
+      // Agregar nuevo listener de delegación
+      elements.kanbanBoard.addEventListener("click", handleTaskActionClick);
+    }
+
+    console.log("Task action delegation configured");
+  }
+
+  /**
+   * Maneja clicks en botones de acción de tareas usando delegación
+   * @param {Event} e - Evento de click
+   */
+  function handleTaskActionClick(e) {
+    // Verificar si el click fue en un botón de editar o eliminar
+    const editBtn = e.target.closest(".edit-task-btn");
+    const deleteBtn = e.target.closest(".delete-task-btn");
+
+    if (editBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const taskId = editBtn.getAttribute("data-id");
+      const task = tasks.find((t) => t._id === taskId);
+
+      if (task) {
+        console.log("Edit button clicked for task:", task._id);
+        openEditTaskModal(task);
+      } else {
+        console.error("Task not found for edit:", taskId);
+        toast.error("Tarea no encontrada");
+      }
+    } else if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const taskId = deleteBtn.getAttribute("data-id");
+
+      if (taskId) {
+        console.log("Delete button clicked for task:", taskId);
+        deleteTask(taskId);
+      } else {
+        console.error("No task ID found for delete button");
+        toast.error("ID de tarea no encontrado");
+      }
+    }
+  }
+
   // Variables globales para drag and drop
   let draggedElement = null;
 
@@ -2077,5 +2272,69 @@ export default function setupDashboard() {
       // Limpiar la referencia del elemento arrastrado
       draggedElement = null;
     }
+  }
+
+  /**
+   * Función para mostrar confirmación de eliminación personalizada
+   * @param {string} title - Título del modal
+   * @param {string} message - Mensaje del modal
+   * @returns {Promise<boolean>} - True si confirma, false si cancela
+   */
+  function showDeleteConfirmation(title, message) {
+    return new Promise((resolve) => {
+      // Crear modal si no existe
+      let modal = document.getElementById("delete-confirmation-modal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "delete-confirmation-modal";
+        modal.className = "modal";
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 id="delete-modal-title">${title}</h3>
+              <button class="modal-close" id="delete-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p id="delete-modal-message">${message}</p>
+            </div>
+            <div class="modal-footer">
+              <button id="delete-cancel-btn" class="btn-secondary">Cancelar</button>
+              <button id="delete-confirm-btn" class="btn-danger">Eliminar</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      } else {
+        // Actualizar contenido del modal existente
+        document.getElementById("delete-modal-title").textContent = title;
+        document.getElementById("delete-modal-message").textContent = message;
+      }
+
+      // Mostrar modal
+      modal.style.display = "flex";
+
+      // Event listeners
+      const handleCancel = () => {
+        modal.style.display = "none";
+        resolve(false);
+      };
+
+      const handleConfirm = () => {
+        modal.style.display = "none";
+        resolve(true);
+      };
+
+      // Agregar event listeners
+      document.getElementById("delete-cancel-btn").onclick = handleCancel;
+      document.getElementById("delete-confirm-btn").onclick = handleConfirm;
+      document.getElementById("delete-modal-close").onclick = handleCancel;
+
+      // Cerrar al hacer click fuera del modal
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          handleCancel();
+        }
+      };
+    });
   }
 }

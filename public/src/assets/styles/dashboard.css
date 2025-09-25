@@ -545,8 +545,10 @@
   font-weight: 500;
   font-size: 1rem;
   margin-bottom: var(--spacing-xs);
-  color: white;
-  text-align: left; /* Explicitly left-align task title */
+  color: #333 !important; /* Ensure proper text color */
+  text-align: left !important; /* Force left-align task title */
+  width: 100%;
+  display: block;
 }
 
 .task-description {
@@ -714,7 +716,7 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
   margin-bottom: 4px;
   font-weight: 500;
   font-size: 0.9rem;
