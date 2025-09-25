@@ -22,8 +22,9 @@ class ToastManager {
    * @param {string} message - El mensaje a mostrar
    * @param {string} type - El tipo de toast (success, error, warning, info)
    * @param {number} duration - Duración en ms (por defecto 5000ms)
+   * @param {Object} options - Opciones adicionales como botón de deshacer
    */
-  show(message, type = "info", duration = 5000) {
+  show(message, type = "info", duration = 5000, options = {}) {
     // Crear clave única para el mensaje
     const messageKey = `${message}-${type}`;
 
@@ -51,6 +52,27 @@ class ToastManager {
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
 
+    // Crear contenido del mensaje
+    const messageContent = document.createElement("span");
+    messageContent.className = "toast-message";
+    messageContent.innerHTML = message;
+
+    // Crear contenedor de botones
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "toast-buttons";
+
+    // Crear botón de deshacer si se proporciona
+    if (options.undoCallback) {
+      const undoButton = document.createElement("button");
+      undoButton.className = "toast-undo";
+      undoButton.textContent = "Deshacer";
+      undoButton.addEventListener("click", () => {
+        options.undoCallback();
+        this.remove(toast);
+      });
+      buttonContainer.appendChild(undoButton);
+    }
+
     // Crear botón de cerrar
     const closeButton = document.createElement("button");
     closeButton.className = "toast-close";
@@ -58,15 +80,11 @@ class ToastManager {
     closeButton.addEventListener("click", () => {
       this.remove(toast);
     });
-
-    // Crear contenido del mensaje
-    const messageContent = document.createElement("span");
-    messageContent.className = "toast-message";
-    messageContent.innerHTML = message;
+    buttonContainer.appendChild(closeButton);
 
     // Ensamblar el toast
     toast.appendChild(messageContent);
-    toast.appendChild(closeButton);
+    toast.appendChild(buttonContainer);
 
     // Añadir el toast al contenedor
     this.container.appendChild(toast);
@@ -136,6 +154,16 @@ class ToastManager {
 
   info(message, duration) {
     return this.show(message, "info", duration);
+  }
+
+  /**
+   * Muestra un toast de deshacer con un botón de deshacer
+   * @param {string} message - El mensaje a mostrar
+   * @param {Function} undoCallback - Función a ejecutar al hacer clic en deshacer
+   * @param {number} duration - Duración en ms (por defecto 5000ms)
+   */
+  undo(message, undoCallback, duration = 5000) {
+    return this.show(message, "warning", duration, { undoCallback });
   }
 }
 

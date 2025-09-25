@@ -25,14 +25,15 @@
 
 .footer-container {
   max-width: 100%;
+  width: 100%;
   margin: 0 auto;
-  padding: 60px 20px 0;
+  padding: 60px 40px 0; /* Aumentado padding lateral para mejor distribución */
 }
 
 /* Main Footer Content */
 .footer-main {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr;
   gap: 60px;
   margin-bottom: 50px;
 }
@@ -112,14 +113,19 @@
 /* Navigation Section */
 .footer-nav {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas fijas en desktop */
+  gap: 60px; /* Mayor separación para mejor distribución */
+  width: 100%;
+  max-width: 1400px; /* Ancho máximo para pantallas muy grandes */
+  margin: 0 auto;
 }
 
 .footer-nav-section {
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 0.8s ease forwards;
+  text-align: center; /* Centrar contenido de cada columna */
+  padding: 0 15px; /* Padding interno para mejor distribución */
 }
 
 .footer-nav-title {
@@ -135,9 +141,10 @@
   content: "";
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
+  left: 50%;
+  transform: translateX(-50%); /* Centrar la línea decorativa */
+  width: 40px; /* Línea más ancha */
+  height: 3px; /* Línea más gruesa */
   background: linear-gradient(90deg, #667eea, #764ba2);
   border-radius: 2px;
 }
@@ -452,6 +459,36 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .footer-container {
+    padding: 60px 30px 0;
+  }
+
+  .footer-nav {
+    gap: 40px;
+    max-width: 1200px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .footer-container {
+    padding: 60px 25px 0;
+  }
+
+  .footer-nav {
+    grid-template-columns: repeat(
+      4,
+      1fr
+    ); /* Mantener 4 columnas hasta 1200px */
+    gap: 30px;
+    max-width: 1000px;
+  }
+
+  .footer-nav-section {
+    padding: 0 10px;
+  }
+}
+
 @media (max-width: 968px) {
   .footer-main {
     grid-template-columns: 1fr;
@@ -459,7 +496,7 @@
   }
 
   .footer-nav {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en tablets */
     gap: 30px;
   }
 }

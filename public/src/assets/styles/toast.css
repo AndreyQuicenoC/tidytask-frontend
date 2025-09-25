@@ -41,6 +41,43 @@
   line-height: 1.4;
 }
 
+/* Contenedor de botones del toast */
+.toast-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Botón de deshacer */
+.toast-undo {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toast-undo:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+}
+
+.toast.toast-warning .toast-undo {
+  background: #212529;
+  color: #fff;
+}
+
+.toast.toast-warning .toast-undo:hover {
+  background: #343a40;
+}
+
 /* Botón de cerrar */
 .toast-close {
   background: none;
@@ -52,7 +89,6 @@
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s ease;
-  margin-left: auto;
   min-width: 24px;
   height: 24px;
   display: flex;
@@ -152,6 +188,15 @@
     font-size: 0.9rem;
     padding: 12px 15px;
   }
+
+  .toast-undo {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .toast-buttons {
+    gap: 6px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -165,6 +210,26 @@
   .toast {
     font-size: 0.85rem;
     padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .toast-message {
+    margin-right: 0;
+    text-align: center;
+  }
+
+  .toast-buttons {
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .toast-undo {
+    font-size: 11px;
+    padding: 4px 8px;
+    flex: 1;
+    margin-right: 8px;
   }
 
   .toast:after {

@@ -99,9 +99,32 @@
 
 /* Información del perfil */
 .profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+/* Primera grilla: Nombres y Apellidos */
+.profile-grid-names {
   display: grid;
-  gap: 1.2rem; /* Reducido de 1.5rem a 1.2rem (-20%) */
-  text-align: left; /* Ensure profile info content is left-aligned */
+  grid-template-columns: 1fr 1fr; /* Cada uno ocupa 1fr */
+  gap: 1.5rem;
+}
+
+/* Segunda grilla: Correo y Edad */
+.profile-grid-contact {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Correo 2fr, Edad 1fr */
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Campo individual de miembro desde */
+.profile-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .info-group {
@@ -844,6 +867,25 @@
     gap: 1.25rem;
   }
 
+  /* En móviles, las grillas se convierten en una sola columna */
+  .profile-grid-names {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-grid-contact {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .info-group-age {
+    max-width: none;
+  }
+
+  .info-input-age {
+    max-width: none;
+  }
+
   .info-value {
     font-size: 1rem;
     padding: 0.625rem 0.875rem;
@@ -864,6 +906,39 @@
   }
 }
 
+/* Estilos específicos para los campos del profile */
+.info-input-email {
+  width: 100%;
+}
+
+.info-input-age {
+  width: 100%;
+  max-width: 180px; /* Limita el ancho del campo edad en desktop */
+}
+
+/* Todos los inputs tienen 100% de ancho dentro de su contenedor */
+#profile-first-name,
+#profile-last-name,
+#profile-email,
+#profile-age {
+  width: 100%;
+}
+
+/* Estilos para que los inputs de cambiar contraseña tengan 100% de ancho */
+.password-section .form-input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.password-section .password-field-container {
+  width: 100%;
+}
+
+.password-section .password-field-container input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
 /* Estilos para desktop (pantallas grandes) */
 @media (min-width: 768px) {
   .profile-container {
@@ -880,13 +955,19 @@
     max-width: 200px;
   }
 
-  .profile-info {
+  /* Las grillas mantienen su estructura en desktop */
+  .profile-grid-names {
     grid-template-columns: 1fr 1fr;
-    gap: 2rem 1.5rem;
+    gap: 2rem;
   }
 
-  .info-group:last-child {
-    grid-column: 1 / -1;
+  .profile-grid-contact {
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+
+  .info-group-age {
+    max-width: 200px;
   }
 
   .profile-actions {

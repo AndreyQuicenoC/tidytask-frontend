@@ -28,7 +28,6 @@
     <span id="user-name">Usuario</span>
   </div>
   <button id="logout-button" class="btn-primary btn-float">
-
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -40,7 +39,6 @@
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
       <polyline points="16,17 21,12 16,7"></polyline>
       <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -99,62 +97,69 @@
       </div>
 
       <form id="profile-form" class="profile-info" novalidate>
-        <div class="info-group">
-          <label class="info-label" for="profile-first-name">Nombres</label>
-          <input
-            type="text"
-            id="profile-first-name"
-            name="profile-first-name"
-            class="info-input"
-            placeholder="Ingresa tus nombres"
-            required
-            minlength="2"
-            maxlength="50"
-          />
+        <!-- Primera grilla: Nombres y Apellidos -->
+        <div class="profile-grid-names">
+          <div class="info-group">
+            <label class="info-label" for="profile-first-name">Nombres</label>
+            <input
+              type="text"
+              id="profile-first-name"
+              name="profile-first-name"
+              class="info-input"
+              placeholder="Ingresa tus nombres"
+              required
+              minlength="2"
+              maxlength="50"
+            />
+          </div>
+
+          <div class="info-group">
+            <label class="info-label" for="profile-last-name">Apellidos</label>
+            <input
+              type="text"
+              id="profile-last-name"
+              name="profile-last-name"
+              class="info-input"
+              placeholder="Ingresa tus apellidos"
+              required
+              minlength="2"
+              maxlength="50"
+            />
+          </div>
         </div>
 
-        <div class="info-group">
-          <label class="info-label" for="profile-last-name">Apellidos</label>
-          <input
-            type="text"
-            id="profile-last-name"
-            name="profile-last-name"
-            class="info-input"
-            placeholder="Ingresa tus apellidos"
-            required
-            minlength="2"
-            maxlength="50"
-          />
+        <!-- Segunda grilla: Correo y Edad -->
+        <div class="profile-grid-contact">
+          <div class="info-group info-group-email">
+            <label class="info-label" for="profile-email">Correo</label>
+            <input
+              type="email"
+              id="profile-email"
+              name="profile-email"
+              class="info-input info-input-email"
+              placeholder="Ingresa tu correo electrónico"
+              required
+              maxlength="100"
+            />
+          </div>
+
+          <div class="info-group info-group-age">
+            <label class="info-label" for="profile-age">Edad</label>
+            <input
+              type="number"
+              id="profile-age"
+              name="profile-age"
+              class="info-input info-input-age"
+              placeholder="Ingresa tu edad"
+              required
+              min="13"
+              max="120"
+            />
+          </div>
         </div>
 
-        <div class="info-group">
-          <label class="info-label" for="profile-age">Edad</label>
-          <input
-            type="number"
-            id="profile-age"
-            name="profile-age"
-            class="info-input"
-            placeholder="Ingresa tu edad"
-            required
-            min="13"
-            max="120"
-          />
-        </div>
-
-        <div class="info-group">
-          <label class="info-label" for="profile-email">Correo</label>
-          <input
-            type="email"
-            id="profile-email"
-            name="profile-email"
-            class="info-input"
-            placeholder="Ingresa tu correo electrónico"
-            required
-            maxlength="100"
-          />
-        </div>
-
-        <div class="info-group">
+        <!-- Campo individual: Miembro desde -->
+        <div class="info-group profile-member-info">
           <label class="info-label">Miembro desde</label>
           <div class="info-value" id="profile-member-since">-</div>
         </div>
@@ -311,10 +316,10 @@
       <button id="close-modal" class="modal-close">&times;</button>
     </div>
     <div class="modal-body">
-      <p>¿Estás seguro de que quieres eliminar tu cuenta?</p>
+      <p><strong>¿Estás seguro que deseas eliminar?</strong></p>
       <p class="warning-text">
-        Esta acción no se puede deshacer. Todos tus datos serán eliminados
-        permanentemente.
+        Tu cuenta será eliminada permanentemente junto con todas tus tareas y
+        datos. Esta acción no se puede deshacer.
       </p>
     </div>
     <div class="modal-footer">
